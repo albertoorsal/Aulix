@@ -13,6 +13,9 @@
     <description>Scholar management platform built on Spring Boot 4.1.0 microservices</description>
 
     <modules>
+        <!-- libraries -->
+        <module>libraries/common-core</module>
+
         <!-- infrastructure applications -->
         <module>applications/service-registry</module>
 
