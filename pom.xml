@@ -19,6 +19,8 @@
 
         <!-- infrastructure applications -->
         <module>applications/service-registry</module>
+        <module>applications/api-gateway</module>
+        <module>applications/config-server</module>
 
     </modules>
 

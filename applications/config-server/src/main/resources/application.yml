@@ -1,0 +1,33 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        native:
+          # Set CONFIG_REPO_PATH explicitly if config-server is launched from anywhere other
+          # than the repository root (e.g. some IDE run configurations default the working
+          # directory to the module folder instead) -- this default only resolves correctly
+          # when the JVM's working directory (user.dir) is the repo root.
+          search-locations: file:${CONFIG_REPO_PATH:${user.dir}/infrastructure/config-repo}
+  profiles:
+    active: native
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,refresh
+  endpoint:
+    health:
+      show-details: always
