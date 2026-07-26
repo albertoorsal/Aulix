@@ -75,22 +75,22 @@
 
             <!-- Internal modules -->
             <dependency>
-                <groupId>com.aulatech</groupId>
+                <groupId>com.aulix</groupId>
                 <artifactId>common-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.aulatech</groupId>
+                <groupId>com.aulix</groupId>
                 <artifactId>security-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.aulatech</groupId>
+                <groupId>com.aulix</groupId>
                 <artifactId>observability-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.aulatech</groupId>
+                <groupId>com.aulix</groupId>
                 <artifactId>testing-support</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
