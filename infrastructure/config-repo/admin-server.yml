@@ -1,0 +1,8 @@
+server:
+  port: 9090
+
+spring:
+  boot:
+    admin:
+      ui:
+        title: AulaTech Platform Admin
