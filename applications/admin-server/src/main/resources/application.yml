@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: admin-server
+  config:
+    import: "optional:configserver:${CONFIG_SERVER_URI:http://localhost:8888}"
+  cloud:
+    config:
+      fail-fast: true
+      retry:
+        max-attempts: 6
+        initial-interval: 1500
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+
+server:
+  port: 9090

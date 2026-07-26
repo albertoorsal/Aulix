@@ -9,7 +9,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Aulix School Management Platform</name>
+    <name>Aluix Enterprise Platform</name>
     <description>Scholar management platform built on Spring Boot 4.1.0 microservices</description>
 
     <modules>
@@ -19,9 +19,10 @@
 
         <!-- infrastructure applications -->
         <module>applications/service-registry</module>
-        <module>applications/api-gateway</module>
         <module>applications/config-server</module>
-
+        <module>applications/api-gateway</module>
+        <module>applications/admin-server</module>
+        <!-- domain applications -->
     </modules>
 
     <properties>
@@ -74,22 +75,22 @@
 
             <!-- Internal modules -->
             <dependency>
-                <groupId>com.aulix</groupId>
+                <groupId>com.aulatech</groupId>
                 <artifactId>common-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.aulix</groupId>
+                <groupId>com.aulatech</groupId>
                 <artifactId>security-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.aulix</groupId>
+                <groupId>com.aulatech</groupId>
                 <artifactId>observability-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.aulix</groupId>
+                <groupId>com.aulatech</groupId>
                 <artifactId>testing-support</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
