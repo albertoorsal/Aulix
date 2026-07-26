@@ -15,6 +15,7 @@
     <modules>
         <!-- libraries -->
         <module>libraries/common-core</module>
+        <module>libraries/security-starter</module>
 
         <!-- infrastructure applications -->
         <module>applications/service-registry</module>
