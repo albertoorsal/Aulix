@@ -5,6 +5,8 @@
     <file url="file://$PROJECT_DIR$/applications/admin-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/applications/api-gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/applications/api-gateway/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/applications/auth-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/applications/auth-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/applications/config-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/applications/config-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/applications/service-registry/src/main/java" charset="UTF-8" />

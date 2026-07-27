@@ -22,7 +22,9 @@
         <module>applications/config-server</module>
         <module>applications/api-gateway</module>
         <module>applications/admin-server</module>
+
         <!-- domain applications -->
+        <module>applications/auth-service</module>
     </modules>
 
     <properties>
