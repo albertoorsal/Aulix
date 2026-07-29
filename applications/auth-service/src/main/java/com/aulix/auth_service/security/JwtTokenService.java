@@ -98,6 +98,20 @@ public class JwtTokenService {
         return claims.getSubject();
     }
 
+    /**
+     * Verifies signature and expiry, and asserts the token is an access token.
+     *
+     * @return the token's claim set
+     * @throws JwtValidationException if the token is invalid, expired, or not an access token
+     */
+    public JWTClaimsSet verifyAccessToken(String token) {
+        JWTClaimsSet claims = verify(token);
+        if (!TOKEN_TYPE_ACCESS.equals(claims.getClaims().get(CLAIM_TOKEN_TYPE))) {
+            throw new JwtValidationException("Token is not an access token");
+        }
+        return claims;
+    }
+
     private String sign(JWTClaimsSet claims) {
         try {
             SignedJWT signedJWT = new SignedJWT(

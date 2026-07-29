@@ -9,13 +9,16 @@ import com.aulix.auth_service.mapper.UserMapper;
 import com.aulix.auth_service.repository.RoleRepository;
 import com.aulix.auth_service.repository.UserRepository;
 import com.aulix.auth_service.security.JwtTokenService;
+import com.aulix.auth_service.security.JwtValidationException;
 import com.aulix.auth_service.service.AuthService;
 import com.aulix.common_core.exception.ResourceAlreadyExistsException;
 import com.aulix.common_core.exception.ResourceNotFoundException;
+import com.nimbusds.jwt.JWTClaimsSet;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
@@ -93,6 +96,21 @@ public class AuthServiceImpl implements AuthService {
         return issueTokens(user);
     }
 
+
+    @Override
+    public VerifyResponse verify(String accessToken) {
+        JWTClaimsSet claims = jwtTokenService.verifyAccessToken(accessToken);
+        try {
+            return new VerifyResponse(
+                    UUID.fromString(claims.getSubject()),
+                    claims.getStringClaim("preferred_username"),
+                    Set.copyOf(claims.getStringListClaim("roles")),
+                    Set.copyOf(claims.getStringListClaim("permissions")),
+                    claims.getExpirationTime().toInstant());
+        } catch (ParseException e) {
+            throw new JwtValidationException("Malformed access token claims");
+        }
+    }
 
     private TokenResponse issueTokens(User user) {
         String accessToken = jwtTokenService.generateAccessToken(user);
