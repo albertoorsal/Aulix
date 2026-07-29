@@ -1,9 +1,11 @@
 package com.aulix.auth_service.controller;
 
 import com.aulix.auth_service.dto.*;
+import com.aulix.auth_service.security.CookieService;
 import com.aulix.auth_service.service.AuthService;
 import com.aulix.common_core.response.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Authentication", description = "Registration, login and token refresh")
+@Tag(name = "Authentication", description = "Registration, login, token refresh and logout")
 public class AuthController {
 
     private final AuthService authService;
+    private final CookieService cookieService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, CookieService cookieService) {
         this.authService = authService;
+        this.cookieService = cookieService;
     }
 
     @PostMapping("/register")
@@ -30,13 +34,25 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<TokenResponse>> login(@Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.ok(ApiResponse.ok(authService.login(request)));
+    public ResponseEntity<ApiResponse<TokenResponse>> login(
+            @Valid @RequestBody LoginRequest request, HttpServletResponse response) {
+        TokenResponse tokens = authService.login(request);
+        cookieService.writeTokenCookies(response, tokens);
+        return ResponseEntity.ok(ApiResponse.ok(tokens));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<TokenResponse>> refresh(@Valid @RequestBody RefreshTokenRequest request) {
-        return ResponseEntity.ok(ApiResponse.ok(authService.refresh(request)));
+    public ResponseEntity<ApiResponse<TokenResponse>> refresh(
+            @Valid @RequestBody RefreshTokenRequest request, HttpServletResponse response) {
+        TokenResponse tokens = authService.refresh(request);
+        cookieService.writeTokenCookies(response, tokens);
+        return ResponseEntity.ok(ApiResponse.ok(tokens));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletResponse response) {
+        cookieService.clearTokenCookies(response);
+        return ResponseEntity.ok(ApiResponse.ok(null, "Logged out successfully"));
     }
 }
 
