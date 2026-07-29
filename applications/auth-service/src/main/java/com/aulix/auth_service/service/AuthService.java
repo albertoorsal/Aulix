@@ -9,4 +9,6 @@ public interface AuthService {
     TokenResponse login(LoginRequest request);
 
     TokenResponse refresh(RefreshTokenRequest request);
+
+    VerifyResponse verify(String accessToken);
 }
