@@ -25,6 +25,7 @@
 
         <!-- domain applications -->
         <module>applications/auth-service</module>
+        <module>applications/student-service</module>
     </modules>
 
     <properties>

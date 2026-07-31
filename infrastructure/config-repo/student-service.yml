@@ -1,0 +1,43 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/aulatech_db}
+    username: ${DB_USERNAME:nailich}
+    password: ${DB_PASSWORD:Senegal26.}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    # All services share aulix_db, so each gets its own history table --
+    # otherwise Flyway's version numbers (every service starts at V1) collide.
+    table: flyway_schema_history_student
+    # The shared schema already has tables from other services (e.g. auth-service's
+    # users/roles/permissions) before this service's own history table exists, which
+    # Flyway treats as an unmanaged non-empty schema by default. Baselining tells it
+    # that's expected here, not a conflict to abort on.
+    baseline-on-migrate: true
+    baseline-version: 0
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      # key/value serializers are set explicitly in KafkaProducerConfig (String/Jackson),
+      # not read from here -- see that class for why a custom ProducerFactory bean exists.
+      acks: all
+    consumer:
+      group-id: student-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      properties:
+        spring.json.value.default.type: com.aulix.student.event.UserCreatedEvent
+        spring.json.use.type.headers: false
+
+app:
+  kafka:
+    topics:
+      student-events: student-events
+      user-events: user-events
