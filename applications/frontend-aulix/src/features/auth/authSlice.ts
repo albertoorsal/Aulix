@@ -1,4 +1,4 @@
-import {createSlice, createAsyncThunk, isRejectedWithValue} from "@reduxjs/toolkit"
+import {createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import type { User } from "../../schemas/auth";
 import { loginRequest, logoutRequest, verifyUserRequest } from "../../apis/auth";
 import type { RootState } from "../../store";
