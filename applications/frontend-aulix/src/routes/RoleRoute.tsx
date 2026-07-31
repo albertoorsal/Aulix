@@ -1,5 +1,5 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { selectRoles } from "../features/auth/authSlice";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { selectIsAuthenticated, selectRoles } from "../features/auth/authSlice";
 import { useAppSelector } from "../store/hooks";
 
 interface RoleRouteProps {
@@ -9,8 +9,11 @@ interface RoleRouteProps {
 // The user's roles come from /api/auth/verify (e.g. ["ADMIN"]). Access is
 // granted if the user has at least one of the allowed roles.
 export default function RoleRoute({ allow }: RoleRouteProps) {
+    const isAuthenticated = useAppSelector(selectIsAuthenticated);
     const roles = useAppSelector(selectRoles);
     const permitted = allow.some((role) => roles.includes(role));
-    if (!permitted) return <Navigate to="/unauthorized" replace />;
+    const location = useLocation()
+    if (!isAuthenticated) return <Navigate to="/login" replace state={{from : location}} />;
+    if (!permitted) return <Navigate to="/dashboard" replace />;
     return <Outlet />;
 }
