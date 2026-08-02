@@ -1,6 +1,7 @@
 package com.aulix.student_service.dto;
 
 import jakarta.validation.constraints.*;
+
 import java.time.LocalDate;
 
 public record CreateStudentRequest (
@@ -11,6 +12,7 @@ public record CreateStudentRequest (
         @NotNull @Past LocalDate dateOfBirth,
         @NotNull LocalDate enrollmentDate,
         @Min(1) int gradeLevel,
-        @NotBlank String curp
+        @NotBlank String curp,
+        @NotBlank String password
 ){
 }

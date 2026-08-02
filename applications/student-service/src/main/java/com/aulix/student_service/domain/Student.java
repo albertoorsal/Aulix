@@ -17,14 +17,6 @@ public class Student extends BaseEntity {
     @Column(name = "student_number", nullable = false, length = 20)
     private String studentNumber;
 
-    @Column(name = "firstName", nullable = false, length = 100)
-    private String firstName;
-
-    @Column(name = "lastName", nullable = false, length = 100)
-    private String lastName;
-
-    @Column(name = "email", nullable = false)
-    private String email;
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
@@ -44,12 +36,9 @@ public class Student extends BaseEntity {
 
     protected Student() {}
 
-    public Student(UUID userId, String studentNumber, String firstName, String lastName, String email, LocalDate dateOfBirth, LocalDate enrollmentDate, int gradeLevel, String curp) {
+    public Student(UUID userId, String studentNumber,LocalDate dateOfBirth, LocalDate enrollmentDate, int gradeLevel, String curp) {
         this.userId = userId;
         this.studentNumber = studentNumber;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
         this.dateOfBirth = dateOfBirth;
         this.enrollmentDate = enrollmentDate;
         this.gradeLevel = gradeLevel;
@@ -65,17 +54,6 @@ public class Student extends BaseEntity {
         return studentNumber;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
 
     public LocalDate getDateOfBirth() {
         return dateOfBirth;

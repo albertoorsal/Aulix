@@ -10,6 +10,7 @@ public class Roles {
     public static final String STAFF = "STAFF";
     public static final String TEACHER = "TEACHER";
     public static final String PARENT = "PARENT";
+    public static final String STUDENT = "STUDENT";
 
     public Roles() {
 

@@ -14,7 +14,6 @@ public interface StudentRepository extends JpaRepository<Student, UUID>,
 
     Optional<Student> findByUserId(UUID userId);
 
-    boolean existsByEmailIgnoreCase(String email);
 
     boolean existsByCurpIgnoreCase(String curp);
 }
