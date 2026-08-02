@@ -1,4 +1,5 @@
 import { GraduationCap, Users } from "lucide-react"
+import { NavLink } from "react-router"
 
 import {
     Sidebar,
@@ -17,10 +18,11 @@ import {
 } from "@/components/ui/sidebar"
 
 const userRoles = [
-    { label: "Admin" },
-    { label: "Staff" },
-    { label: "Teacher" },
-    { label: "Parent" },
+    { label: "Student", href: "/students" },
+    { label: "Admin", href: "#" },
+    { label: "Staff", href: "#" },
+    { label: "Teacher", href: "#" },
+    { label: "Parent", href: "#" },
 ]
 
 export function AppSidebar() {
@@ -59,8 +61,15 @@ export function AppSidebar() {
                                 <SidebarMenuSub>
                                     {userRoles.map((role) => (
                                         <SidebarMenuSubItem key={role.label}>
-                                            <SidebarMenuSubButton href="#">
-                                                <span>{role.label}</span>
+                                            <SidebarMenuSubButton asChild>
+                                                <NavLink
+                                                    to={role.href}
+                                                    className={({ isActive }) =>
+                                                        isActive ? "font-medium text-sidebar-foreground" : undefined
+                                                    }
+                                                >
+                                                    <span>{role.label}</span>
+                                                </NavLink>
                                             </SidebarMenuSubButton>
                                         </SidebarMenuSubItem>
                                     ))}

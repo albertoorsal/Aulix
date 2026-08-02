@@ -1,6 +1,7 @@
 package com.aulix.auth_service.controller;
 
 import com.aulix.auth_service.dto.UserResponse;
+import com.aulix.auth_service.dto.UserSearchCriteria;
 import com.aulix.auth_service.service.UserService;
 import com.aulix.common_core.pagination.PageResponse;
 import com.aulix.common_core.response.ApiResponse;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -31,10 +33,10 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> findAll(Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.ok(PageResponse.from(userService.findAll(pageable))));
-    }
+//    @GetMapping
+//    public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> findAll(Pageable pageable) {
+//        return ResponseEntity.ok(ApiResponse.ok(PageResponse.from(userService.findAll(pageable))));
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserResponse>> findById(@PathVariable UUID id) {
@@ -67,5 +69,22 @@ public class UserController {
     @PostMapping("/{id}/roles/{roleName}/revoke")
     public ResponseEntity<ApiResponse<UserResponse>> revokeRole(@PathVariable UUID id, @PathVariable String roleName) {
         return ResponseEntity.ok(ApiResponse.ok(userService.revokeRole(id, roleName), "Role revoked"));
+    }
+
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "', '" + Roles.TEACHER + "')")
+    public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> search(
+            @RequestParam(required = false) String search,
+            Pageable pageable
+    ) {
+        UserSearchCriteria criteria = new UserSearchCriteria(search);
+        return ResponseEntity.ok(ApiResponse.ok(PageResponse.from(userService.search(criteria, pageable))));
+    }
+
+    @PostMapping("/batch")
+    @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "', '" + Roles.TEACHER + "')")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> findAllByIds(@RequestBody List<UUID> ids) {
+        return ResponseEntity.ok(ApiResponse.ok(userService.findAllByIds(ids)));
     }
 }

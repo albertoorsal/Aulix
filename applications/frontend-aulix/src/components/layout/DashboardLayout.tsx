@@ -26,7 +26,13 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-export function DashboardLayout({ children }: { children: ReactNode }) {
+export function DashboardLayout({
+    children,
+    breadcrumb = "Users",
+}: {
+    children: ReactNode
+    breadcrumb?: string
+}) {
     return (
         <SidebarProvider>
             <AppSidebar />
@@ -42,7 +48,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
-                                    <BreadcrumbPage>Users</BreadcrumbPage>
+                                    <BreadcrumbPage>{breadcrumb}</BreadcrumbPage>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>

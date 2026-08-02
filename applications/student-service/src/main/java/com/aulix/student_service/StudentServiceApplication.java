@@ -5,7 +5,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-@SpringBootApplication(scanBasePackages = {"com.aulix.student_service", "com.aulix.security_starter", "com.aulix.common_core"})
+@SpringBootApplication(
+		scanBasePackages = {
+				"com.aulix.student_service", "com.aulix.security_starter", "com.aulix.common_core"
+		}
+)
 @EnableDiscoveryClient
 @EnableJpaAuditing
 public class StudentServiceApplication {

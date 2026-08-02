@@ -12,6 +12,15 @@ public record StudentResponse(
         EnrollmentStatus enrollmentStatus,
         LocalDate enrollmentDate,
         int gradeLevel,
-        String curp
+        String curp,
+        String firstName,
+        String lastName,
+        String email
 ) {
+    public StudentResponse withUser(String firstName, String lastName, String email) {
+        return new StudentResponse(
+                id, userId, studentNumber, dateOfBirth, enrollmentStatus, enrollmentDate, gradeLevel, curp,
+                firstName, lastName, email
+        );
+    }
 }

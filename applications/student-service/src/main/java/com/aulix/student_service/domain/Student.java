@@ -1,5 +1,6 @@
 package com.aulix.student_service.domain;
 
+
 import com.aulix.common_core.domain.BaseEntity;
 import jakarta.persistence.*;
 import java.time.LocalDate;

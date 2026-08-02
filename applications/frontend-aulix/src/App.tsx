@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import RoleRoute from './routes/RoleRoute';
 import Admin from './pages/Admin';
 import PublicRoute from './routes/PublicRouter';
+import Student from './pages/Student';
 
 function App() {
     const dispatch = useAppDispatch();
@@ -40,6 +41,9 @@ function App() {
 				{/* Private: must be authenticated */}
 				<Route element={<ProtectedRoute />}>
 				<Route path="/dashboard" element={<Dashboard />} />
+
+			
+				<Route path="/students" element={<Student />} />
 
 				{/* Private AND admin-only: guards nest */}
 				<Route element={<RoleRoute allow={["ADMIN"]} />}>

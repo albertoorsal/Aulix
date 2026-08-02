@@ -27,7 +27,6 @@
 			<groupId>com.aulix</groupId>
 			<artifactId>security-starter</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -110,8 +109,19 @@
 		</dependency>
 		<dependency>
 			<groupId>com.aulix</groupId>
-			<artifactId>testing-support</artifactId>
-			<scope>test</scope>
+			<artifactId>common-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.aulix</groupId>
+			<artifactId>common-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.aulix</groupId>
+			<artifactId>common-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
 		</dependency>
 	</dependencies>
 

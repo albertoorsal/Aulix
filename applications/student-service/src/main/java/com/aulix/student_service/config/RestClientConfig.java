@@ -13,8 +13,12 @@ public class RestClientConfig {
     // by type to talk to the Eureka server -- doesn't pick up a load-balanced builder
     // and try to resolve "localhost" as a discoverable service during its own startup.
     @Bean
-    public RestClient userServiceRestClient(LoadBalancerInterceptor loadBalancerInterceptor) {
+    public RestClient userServiceRestClient(
+            LoadBalancerInterceptor loadBalancerInterceptor,
+            AuthHeaderForwardingInterceptor authHeaderForwardingInterceptor
+    ) {
         return RestClient.builder()
+                .requestInterceptor(authHeaderForwardingInterceptor)
                 .requestInterceptor(loadBalancerInterceptor)
                 .baseUrl("http://auth-service")
                 .build();

@@ -5,7 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-@SpringBootApplication(scanBasePackages = {"com.aulix.auth_service", "com.aulix.security_starter"})
+@SpringBootApplication(
+		scanBasePackages = {"com.aulix.auth_service", "com.aulix.security_starter"}
+)
 @EnableDiscoveryClient
 @EnableJpaAuditing
 public class AuthServiceApplication {

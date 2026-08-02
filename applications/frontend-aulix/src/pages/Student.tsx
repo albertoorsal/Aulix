@@ -7,49 +7,38 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button"
+import { useState } from "react"
+import AddStudent from "@/components/AddStudent"
 
-const roleSummary = [
-    { role: "Admin", count: 3 },
-    { role: "Staff", count: 12 },
-    { role: "Teacher", count: 28 },
-    { role: "Parent", count: 154 },
-    { role: "Student", count: 200 },
-]
+// const gradeSummary = [
+//     { grade: "Freshman", count: 48 },
+//     { grade: "Sophomore", count: 52 },
+//     { grade: "Junior", count: 49 },
+//     { grade: "Senior", count: 51 },
+// ]
 
-export function Dashboard() {
+export default function Student() {
+    
     return (
-        <DashboardLayout>
+        <DashboardLayout breadcrumb="Student">
             <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Users</h1>
-                <p className="text-sm text-muted-foreground">
-                    Manage every account across the school by role.
-                </p>
+                <h1 className="text-2xl font-semibold tracking-tight">Students</h1>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                {roleSummary.map((item) => (
-                    <Card key={item.role}>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="flex items-center justify-between text-sm font-medium text-muted-foreground">
-                                {item.role}
-                                <Badge variant="secondary">{item.count}</Badge>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Skeleton className="h-6 w-16" />
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+            <AddStudent />
+            {/* <div className="flex">
+                <Button variant="outline">New +</Button>
+            </div> */}
 
             <Card className="flex-1">
                 <CardHeader>
-                    <CardTitle>All users</CardTitle>
+                    <CardTitle>All students</CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-3">
                     <div className="grid grid-cols-[2fr_1fr_1fr_auto] gap-4 border-b pb-2 text-xs font-medium text-muted-foreground">
                         <span>Name</span>
-                        <span>Role</span>
+                        <span>Grade</span>
                         <span>Status</span>
                         <span className="text-right">Actions</span>
                     </div>
