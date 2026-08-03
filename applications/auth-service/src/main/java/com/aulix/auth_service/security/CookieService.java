@@ -46,7 +46,7 @@ public class CookieService {
                 .httpOnly(true)
                 .secure(properties.secure())
                 .sameSite(properties.sameSite())
-                .path("/api/auth");
+                .path("/");
         if (properties.domain() != null && !properties.domain().isBlank()) {
             builder.domain(properties.domain());
         }

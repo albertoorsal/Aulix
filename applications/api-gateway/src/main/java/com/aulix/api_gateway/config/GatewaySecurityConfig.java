@@ -11,11 +11,15 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter;
+import org.springframework.security.oauth2.server.resource.web.server.authentication.ServerBearerTokenAuthenticationConverter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.http.HttpHeaders;
+import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 import java.util.List;
@@ -45,12 +49,30 @@ public class GatewaySecurityConfig {
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/api/auth/**").permitAll()
-                        .pathMatchers("/actuator/health/**", "/actuator/info", "/actuator/prometheus").permitAll()
+                        .pathMatchers("/actuator/health/**", "/actuator/info", "/actuator/prometheus", "/actuator/gateway/**").permitAll()
                         .pathMatchers("/fallback/**").permitAll()
                         .anyExchange().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
+                        .bearerTokenConverter(cookieOrHeaderBearerTokenConverter())
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(reactiveJwtAuthenticationConverter())));
         return http.build();
+    }
+
+    /**
+     * The browser stores the access token as an HttpOnly cookie (not readable by JS, so it's
+     * never attached as an Authorization header); this falls back to reading that cookie when
+     * no Authorization header is present, so cookie-based and header-based clients both work.
+     */
+    private ServerAuthenticationConverter cookieOrHeaderBearerTokenConverter() {
+        ServerBearerTokenAuthenticationConverter headerConverter = new ServerBearerTokenAuthenticationConverter();
+        return exchange -> {
+            String header = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+            if (header != null && !header.isBlank()) {
+                return headerConverter.convert(exchange);
+            }
+            return Mono.justOrEmpty(exchange.getRequest().getCookies().getFirst("accessToken"))
+                    .map(cookie -> new org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken(cookie.getValue()));
+        };
     }
 
 

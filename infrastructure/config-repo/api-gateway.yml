@@ -4,12 +4,29 @@ server:
 spring:
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: false
-
-
-
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: false
+          routes:
+            - id: student-service
+              uri: lb://student-service
+              predicates:
+                - Path=/api/students/**
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/auth/**
+            - id: user-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/users/**
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics,circuitbreakers,circuitbreakerevents,gateway
 
 security:
   jwt:

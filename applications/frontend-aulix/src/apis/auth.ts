@@ -1,6 +1,7 @@
 import type { User, VerifyUserResponse } from "../schemas/auth";
 
-const API_BASE = "http://localhost:9000/api/auth";
+const API_BASE = "http://localhost:8080/api/auth";
+
 
 export async function loginRequest(email : string, password: string) : Promise<void> {
     const response = await fetch(`${API_BASE}/login`, {
@@ -12,6 +13,7 @@ export async function loginRequest(email : string, password: string) : Promise<v
 
     if (!response.ok) {
         const data = await response.json().catch(() => ({}));
+        console.log(data)
         throw new Error(data.message || "Invalid email or password");
     }
 }
