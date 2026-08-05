@@ -52,6 +52,7 @@ public class StudentServiceImpl implements StudentService {
             throw new DuplicateStudentException("CURP: ", request.curp());
         }
 
+
         // First we need to create a user and retrieve user_id
         UserResponse user = userClient.createUser(new CreateUserRequest(
                 request.email(),
