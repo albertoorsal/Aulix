@@ -1,30 +1,40 @@
-
+export interface CreateStudentRequest {
+  studentNumber: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  dateOfBirth: string;
+  enrollmentDate: string;
+  gradeLevel: number;
+  curp: string;
+  password: string;
+}
 
 export interface StudentResponse {
-    id: string;
-    userId: string;
-    studentNumber: string;
-    enrollmentStatus: string;
-    curp: string;
-    firstName: string;
-    lastName: string;
-    emailName: string;
+  id: string;
+  userId: string;
+  studentNumber: string;
+  enrollmentStatus: string;
+  curp: string;
+  firstName: string;
+  lastName: string;
+  emailName: string;
 }
 
 export interface PageResponse<T> {
-    content: T[];
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-    first: boolean;
-    last: boolean;
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
 }
 
 export interface StudentSearchResponse {
-    success: boolean;
-    data: PageResponse<StudentResponse>;
-    message: string | null;
-    timestamp: string;
-    error: string | null;
+  success: boolean;
+  data: PageResponse<StudentResponse>;
+  message: string | null;
+  timestamp: string;
+  error: string | null;
 }

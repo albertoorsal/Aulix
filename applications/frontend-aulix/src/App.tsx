@@ -9,6 +9,7 @@ import RoleRoute from './routes/RoleRoute';
 import Admin from './pages/Admin';
 import PublicRoute from './routes/PublicRouter';
 import Student from './pages/Student';
+import { Toaster } from './components/ui/sonner';
 
 function App() {
     const dispatch = useAppDispatch();
@@ -30,6 +31,7 @@ function App() {
 
     return (
         <>
+            <Toaster />
             <Routes>
         		{/* Public */}
 
