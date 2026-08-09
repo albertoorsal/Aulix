@@ -2,6 +2,7 @@ package com.aulix.student_service.client;
 
 import com.aulix.common_core.pagination.PageResponse;
 import com.aulix.common_core.response.ApiResponse;
+import com.aulix.student_service.dto.UpdateStudentRequest;
 import com.aulix.student_service.exception.DuplicateStudentException;
 import com.aulix.student_service.exception.UserProvisioningException;
 import org.springframework.core.ParameterizedTypeReference;
@@ -109,5 +110,50 @@ public class UserClient {
                     "auth-service returned an empty response during batch user retrieval");
         }
         return response.data();
+    }
+
+
+    public UserResponse updateUserByUserId(UUID id, UpdateStudentRequest request) {
+        ApiResponse<UserResponse> response = restClient.put()
+                .uri("/api/users/{id}", id)
+                .body(request)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                    if (res.getStatusCode().value() == 409) {
+                        throw new DuplicateStudentException("email", request.email());
+                    }
+                    throw new UserProvisioningException(
+                            "auth-service rejected user update for '%s' with status %s"
+                                    .formatted(request.email(), res.getStatusCode()));
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                    throw new UserProvisioningException(
+                            "auth-service failed to update user for '%s' with status %s"
+                                    .formatted(request.email(), res.getStatusCode()));
+                })
+                .body(new ParameterizedTypeReference<ApiResponse<UserResponse>>() {});
+
+        if (response == null || response.data() == null) {
+            throw new UserProvisioningException(
+                    "auth-service returned an empty response while updating user for '%s'".formatted(request.email()));
+        }
+        return response.data();
+    }
+
+    public void deleteUserByUserId(UUID id) {
+        restClient.delete()
+                .uri("/api/users/{id}", id)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                    throw new UserProvisioningException(
+                            "auth-service rejected user deletion for id '%s' with status %s"
+                                    .formatted(id, res.getStatusCode()));
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                    throw new UserProvisioningException(
+                            "auth-service failed to delete user for id '%s' with status %s"
+                                    .formatted(id, res.getStatusCode()));
+                })
+                .toBodilessEntity();
     }
 }

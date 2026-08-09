@@ -2,6 +2,7 @@ package com.aulix.auth_service.service.impl;
 
 import com.aulix.auth_service.domain.Role;
 import com.aulix.auth_service.domain.User;
+import com.aulix.auth_service.dto.UpdateUserRequest;
 import com.aulix.auth_service.dto.UserResponse;
 import com.aulix.auth_service.dto.UserSearchCriteria;
 import com.aulix.auth_service.mapper.UserMapper;
@@ -92,6 +93,21 @@ public class UserServiceImpl implements UserService {
 
 
         return userRepository.findAll(spec, pageable).map(userMapper::toResponse);
+    }
+
+    @Override
+    public UserResponse update(UUID id, UpdateUserRequest request) {
+        User user = getUserOrThrow(id);
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        user.setEmail(request.email());
+        return userMapper.toResponse(userRepository.save(user));
+    }
+
+    @Override
+    public void delete(UUID id) {
+        User user = getUserOrThrow(id);
+        userRepository.delete(user);
     }
 
     private User getUserOrThrow(UUID id) {

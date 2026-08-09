@@ -75,4 +75,12 @@ public class Student extends BaseEntity {
     public String getCurp() {
         return curp;
     }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public void setGradeLevel(int gradeLevel) {
+        this.gradeLevel = gradeLevel;
+    }
 }

@@ -9,11 +9,20 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useEffect, useState } from "react"
 import AddStudent from "@/components/AddStudent"
+import EditStudent from "@/components/EditStudent"
+import DeleteStudentDialog from "@/components/DeleteStudentDialog"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { searchStudents } from "../features/students/studentSlice"
-import { ChevronLeft, ChevronRight, Search } from "lucide-react"
+import { ChevronLeft, ChevronRight, MoreHorizontal, Search } from "lucide-react"
+import type { StudentResponse } from "@/schemas/student"
 
 export default function Student() {
     const dispatch = useAppDispatch();
@@ -21,6 +30,8 @@ export default function Student() {
         (state) => state.students
     );
     const [searchKeyword, setSearchKeyword] = useState("")
+    const [editingStudent, setEditingStudent] = useState<StudentResponse | null>(null)
+    const [deletingStudent, setDeletingStudent] = useState<StudentResponse | null>(null)
 
     useEffect(() => {
         dispatch(searchStudents({ search: searchKeyword, page: 0 }));
@@ -109,7 +120,7 @@ export default function Student() {
                                         {student.firstName} {student.lastName}
                                     </span>
                                     <span className="text-xs text-muted-foreground">
-                                        {student.emailName}
+                                        {student.email}
                                     </span>
                                 </div>
                                 <span className="text-sm text-muted-foreground">
@@ -119,9 +130,25 @@ export default function Student() {
                                     {student.enrollmentStatus.toLowerCase()}
                                 </Badge>
                                 <div className="flex justify-end">
-                                    <Button variant="ghost" size="sm">
-                                        View
-                                    </Button>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="icon-sm">
+                                                <MoreHorizontal className="size-4" />
+                                                <span className="sr-only">Actions</span>
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onSelect={() => setEditingStudent(student)}>
+                                                Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                variant="destructive"
+                                                onSelect={() => setDeletingStudent(student)}
+                                            >
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
                             </div>
                         ))
@@ -156,6 +183,26 @@ export default function Student() {
                     )}
                 </CardContent>
             </Card>
+
+            {editingStudent && (
+                <EditStudent
+                    student={editingStudent}
+                    open={editingStudent !== null}
+                    onOpenChange={(open) => {
+                        if (!open) setEditingStudent(null)
+                    }}
+                />
+            )}
+
+            {deletingStudent && (
+                <DeleteStudentDialog
+                    student={deletingStudent}
+                    open={deletingStudent !== null}
+                    onOpenChange={(open) => {
+                        if (!open) setDeletingStudent(null)
+                    }}
+                />
+            )}
         </DashboardLayout>
     )
 }

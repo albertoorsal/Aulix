@@ -7,6 +7,7 @@ import com.aulix.student_service.domain.EnrollmentStatus;
 import com.aulix.student_service.dto.CreateStudentRequest;
 import com.aulix.student_service.dto.StudentSearchCriteria;
 import com.aulix.student_service.dto.StudentResponse;
+import com.aulix.student_service.dto.UpdateStudentRequest;
 import com.aulix.student_service.service.StudentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/students")
@@ -51,5 +54,29 @@ public class StudentController {
 
 
         return ResponseEntity.ok(ApiResponse.ok(PageResponse.from(studentService.search(criteria, pageable))));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "', '" + Roles.TEACHER + "')")
+    public ResponseEntity<ApiResponse<StudentResponse>> findById(@PathVariable UUID id) {
+        return ResponseEntity.ok(ApiResponse.ok(studentService.findById(id)));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "')")
+    @Operation(summary = "Update a Student")
+    public ResponseEntity<ApiResponse<StudentResponse>> update(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateStudentRequest request
+    ) {
+        return ResponseEntity.ok(ApiResponse.ok(studentService.update(id, request), "Student updated successfully"));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "')")
+    @Operation(summary = "Remove a Student")
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
+        studentService.delete(id);
+        return ResponseEntity.ok(ApiResponse.ok(null, "Student record deleted"));
     }
 }

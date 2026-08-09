@@ -1,5 +1,6 @@
 package com.aulix.auth_service.service;
 
+import com.aulix.auth_service.dto.UpdateUserRequest;
 import com.aulix.auth_service.dto.UserResponse;
 import com.aulix.auth_service.dto.UserSearchCriteria;
 import org.springframework.data.domain.Page;
@@ -26,4 +27,9 @@ public interface UserService {
     UserResponse revokeRole(UUID id, String roleName);
 
     Page<UserResponse> search(UserSearchCriteria criteria, Pageable pageable);
+
+
+    UserResponse update(UUID id, UpdateUserRequest request);
+
+    void delete(UUID id);
 }

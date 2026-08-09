@@ -1,8 +1,10 @@
 import type {
+  ApiResponse,
   CreateStudentRequest,
   PageResponse,
   StudentResponse,
   StudentSearchResponse,
+  UpdateStudentRequest,
 } from "../schemas/student";
 
 const API_BASE = "http://localhost:8080/api/students";
@@ -61,4 +63,37 @@ export async function createRequest(
   }
 
   console.log(`Response: ${Object.entries(response)}`);
+}
+
+export async function updateRequest(
+  id: string,
+  request: UpdateStudentRequest,
+): Promise<StudentResponse> {
+  const response = await fetch(`${API_BASE}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.message || "Invalid update");
+  }
+
+  const body = (await response.json()) as ApiResponse<StudentResponse>;
+  return body.data;
+}
+
+export async function deleteRequest(id: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/${id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.message || "Delete failed");
+  }
 }

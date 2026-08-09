@@ -1,5 +1,6 @@
 package com.aulix.auth_service.controller;
 
+import com.aulix.auth_service.dto.UpdateUserRequest;
 import com.aulix.auth_service.dto.UserResponse;
 import com.aulix.auth_service.dto.UserSearchCriteria;
 import com.aulix.auth_service.service.UserService;
@@ -7,6 +8,7 @@ import com.aulix.common_core.pagination.PageResponse;
 import com.aulix.common_core.response.ApiResponse;
 import com.aulix.security_starter.annotation.Roles;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,10 +35,6 @@ public class UserController {
         this.userService = userService;
     }
 
-//    @GetMapping
-//    public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> findAll(Pageable pageable) {
-//        return ResponseEntity.ok(ApiResponse.ok(PageResponse.from(userService.findAll(pageable))));
-//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserResponse>> findById(@PathVariable UUID id) {
@@ -86,5 +84,18 @@ public class UserController {
     @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "', '" + Roles.TEACHER + "')")
     public ResponseEntity<ApiResponse<List<UserResponse>>> findAllByIds(@RequestBody List<UUID> ids) {
         return ResponseEntity.ok(ApiResponse.ok(userService.findAllByIds(ids)));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "', '" + Roles.TEACHER + "')")
+    public ResponseEntity<ApiResponse<UserResponse>> update(@PathVariable UUID id, @Valid @RequestBody UpdateUserRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(userService.update(id, request)));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "', '" + Roles.TEACHER + "')")
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
+        userService.delete(id);
+        return ResponseEntity.ok(ApiResponse.ok(null, "User record deleted"));
     }
 }

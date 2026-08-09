@@ -8,11 +8,13 @@ import com.aulix.student_service.domain.Student;
 import com.aulix.student_service.dto.CreateStudentRequest;
 import com.aulix.student_service.dto.StudentResponse;
 import com.aulix.student_service.dto.StudentSearchCriteria;
+import com.aulix.student_service.dto.UpdateStudentRequest;
 import com.aulix.student_service.exception.DuplicateStudentException;
 import com.aulix.student_service.mapper.StudentMapper;
 import com.aulix.student_service.repository.StudentRepository;
 import com.aulix.student_service.repository.StudentSpecifications;
 import com.aulix.student_service.service.StudentService;
+import com.aulix.common_core.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -108,5 +110,43 @@ public class StudentServiceImpl implements StudentService {
             return response;
         }
         return response.withUser(user.firstName(), user.lastName(), user.email());
+    }
+
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public StudentResponse findById(UUID id) {
+        Student student = getStudentOrThrow(id);
+        UserResponse user = userClient.findAllByIds(List.of(student.getUserId())).stream()
+                .findFirst()
+                .orElse(null);
+        StudentResponse response = studentMapper.toResponse(student);
+        return user == null ? response : response.withUser(user.firstName(), user.lastName(), user.email());
+    }
+
+    @Override
+    @Transactional
+    public StudentResponse update(UUID id, UpdateStudentRequest request) {
+        Student student = getStudentOrThrow(id);
+
+        UserResponse user = userClient.updateUserByUserId(student.getUserId(), request);
+
+        student.setDateOfBirth(request.dateOfBirth());
+        student.setGradeLevel(request.gradeLevel());
+        Student saved = studentRepository.save(student);
+
+        return studentMapper.toResponse(saved).withUser(user.firstName(), user.lastName(), user.email());
+    }
+
+    @Override
+    @Transactional
+    public void delete(UUID id) {
+        Student student = getStudentOrThrow(id);
+        studentRepository.delete(student);
+        userClient.deleteUserByUserId(student.getUserId());
+    }
+
+    private Student getStudentOrThrow(UUID id) {
+        return studentRepository.findById(id).orElseThrow(() -> ResourceNotFoundException.of("Student", id));
     }
 }
