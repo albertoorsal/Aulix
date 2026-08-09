@@ -14,6 +14,10 @@ spring:
               uri: lb://student-service
               predicates:
                 - Path=/api/students/**
+            - id: staff-service
+              uri: lb://staff-service
+              predicates:
+                - Path=/api/staff/**
             - id: auth-service
               uri: lb://auth-service
               predicates:
@@ -36,6 +40,8 @@ resilience4j:
   circuitbreaker:
     instances:
       studentServiceCircuitBreaker:
+        base-config: default
+      staffServiceCircuitBreaker:
         base-config: default
       notificationServiceCircuitBreaker:
         base-config: default

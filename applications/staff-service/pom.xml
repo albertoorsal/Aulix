@@ -11,11 +11,10 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>student-service</artifactId>
+	<artifactId>staff-service</artifactId>
 	<packaging>jar</packaging>
-	<name>student-service</name>
-	<description>Reference domain service: full CRUD for student records, enrollment, and academic status. Template for all future domain services.</description>
-
+	<name>staff-service</name>
+	<description>Full CRUD for Staff</description>
 
 	<dependencies>
 		<dependency>
@@ -107,25 +106,13 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.aulix</groupId>
-			<artifactId>common-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.aulix</groupId>
-			<artifactId>common-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.aulix</groupId>
-			<artifactId>common-core</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-autoconfigure</artifactId>
 		</dependency>
 	</dependencies>
 
 	<build>
-		<finalName>student-service</finalName>
+		<finalName>staff-service</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
