@@ -35,8 +35,6 @@ export async function searchRequest({
     credentials: "include",
   });
 
-  console.log(response);
-
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
     throw new Error(data.message || "Not rows");

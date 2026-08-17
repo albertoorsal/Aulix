@@ -1,63 +1,63 @@
-import ProtectedRoute from './routes/ProtectedRoute'
-import { Dashboard } from './pages/Dashboard'
-import { Navigate, Route, Routes } from 'react-router'
-import { useAppDispatch, useAppSelector } from './store/hooks';
-import { checkAuth, selectIsInitialized } from './features/auth/authSlice';
-import { useEffect } from 'react';
-import Login from './pages/Login';
-import RoleRoute from './routes/RoleRoute';
-import Admin from './pages/Admin';
-import PublicRoute from './routes/PublicRouter';
-import Student from './pages/Student';
-import { Toaster } from './components/ui/sonner';
+import ProtectedRoute from "./routes/ProtectedRoute";
+import { Dashboard } from "./pages/Dashboard";
+import { Navigate, Route, Routes } from "react-router";
+import { useAppDispatch, useAppSelector } from "./store/hooks";
+import { checkAuth, selectIsInitialized } from "./features/auth/authSlice";
+import { useEffect } from "react";
+import Login from "./pages/Login";
+import RoleRoute from "./routes/RoleRoute";
+import Admin from "./pages/Admin";
+import PublicRoute from "./routes/PublicRouter";
+import Student from "./pages/Student";
+import Staff from "./pages/Staff";
+import { Toaster } from "./components/ui/sonner";
 
 function App() {
-    const dispatch = useAppDispatch();
-    const initialized = useAppSelector(selectIsInitialized);
+  const dispatch = useAppDispatch();
+  const initialized = useAppSelector(selectIsInitialized);
 
-    useEffect(() => {
-		dispatch(checkAuth());
-    }, [dispatch]);
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
 
-
-    if (!initialized) {
-		return (
-			<div>
-				<div>Loading...</div>
-			</div>
-		)
-    }
-
-
+  if (!initialized) {
     return (
-        <>
-            <Toaster />
-            <Routes>
-        		{/* Public */}
+      <div>
+        <div>Loading...</div>
+      </div>
+    );
+  }
 
-				{/* Login is public, but redirect away if already signed in */}
-				<Route element={<PublicRoute />}>
-					<Route path="/login" element={<Login />} />
-				</Route>
+  return (
+    <>
+      <Toaster />
+      <Routes>
+        {/* Public */}
 
-				{/* Private: must be authenticated */}
-				<Route element={<ProtectedRoute />}>
-				<Route path="/dashboard" element={<Dashboard />} />
+        {/* Login is public, but redirect away if already signed in */}
+        <Route element={<PublicRoute />}>
+          <Route path="/login" element={<Login />} />
+        </Route>
 
-			
-				<Route path="/students" element={<Student />} />
+        {/* Private: must be authenticated */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
 
-				{/* Private AND admin-only: guards nest */}
-				<Route element={<RoleRoute allow={["ADMIN"]} />}>
-					<Route path="/admin" element={<Admin />} />
-				</Route>
-				</Route>
+          <Route path="/students" element={<Student />} />
 
-        	{/* Catch-all */}
-        	<Route path="*" element={<Navigate to="/dashboard" replace />} />
-      		</Routes>
-        </>
-    )
+          <Route path="/staff" element={<Staff />} />
+
+          {/* Private AND admin-only: guards nest */}
+          <Route element={<RoleRoute allow={["ADMIN"]} />}>
+            <Route path="/admin" element={<Admin />} />
+          </Route>
+        </Route>
+
+        {/* Catch-all */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </>
+  );
 }
 
-export default App
+export default App;
