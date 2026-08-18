@@ -1,4 +1,5 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -18,10 +19,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { searchStaffs } from "@/features/staffs/staffSlice";
+import AddStaff from "@/components/AddStaff";
+import EditStaff from "@/components/EditStaff";
+import DeleteStaffDialog from "@/components/DeleteStaffDialog";
+import type { StaffResponse } from "@/schemas/staff";
 
 export default function Staff() {
   const dispatch = useAppDispatch();
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [editingStaff, setEditingStaff] = useState<StaffResponse | null>(null);
+  const [deletingStaff, setDeletingStaff] = useState<StaffResponse | null>(null);
   const {
     staffs,
     status,
@@ -43,10 +50,13 @@ export default function Staff() {
 
   const isLoading = status === "loading";
 
-  function handleSearch() {}
+  function handleSearch(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    dispatch(searchStaffs({ search: searchKeyword, page: 0 }));
+  }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout breadcrumb="Staff">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-tight">Staff</h1>
       </div>
@@ -69,10 +79,8 @@ export default function Staff() {
             Search
           </Button>
         </form>
-        {/* <AddStaff /> */}
+        <AddStaff />
       </div>
-
-      {/* Content Staff */}
 
       <Card className="flex-1">
         <CardHeader>
@@ -129,9 +137,9 @@ export default function Staff() {
                   {staff.employeeNumber}
                 </span>
 
-                <span className="text-sm text-muted-foreground">
-                  {staff.staffType}
-                </span>
+                <Badge variant="outline" className="w-fit capitalize">
+                  {staff.staffType.toLowerCase()}
+                </Badge>
 
                 <div className="flex justify-end">
                   <DropdownMenu>
@@ -142,8 +150,15 @@ export default function Staff() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
-                      <DropdownMenuItem>Delete</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => setEditingStaff(staff)}>
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onSelect={() => setDeletingStaff(staff)}
+                      >
+                        Delete
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -180,6 +195,26 @@ export default function Staff() {
           )}
         </CardContent>
       </Card>
+
+      {editingStaff && (
+        <EditStaff
+          staff={editingStaff}
+          open={editingStaff !== null}
+          onOpenChange={(open) => {
+            if (!open) setEditingStaff(null);
+          }}
+        />
+      )}
+
+      {deletingStaff && (
+        <DeleteStaffDialog
+          staff={deletingStaff}
+          open={deletingStaff !== null}
+          onOpenChange={(open) => {
+            if (!open) setDeletingStaff(null);
+          }}
+        />
+      )}
     </DashboardLayout>
   );
 }

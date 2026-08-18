@@ -1,5 +1,15 @@
-import { searchRequest, type SearchStaffParams } from "@/apis/staff";
-import type { StaffResponse } from "@/schemas/staff";
+import {
+  createRequest,
+  deleteRequest,
+  searchRequest,
+  updateRequest,
+  type SearchStaffParams,
+} from "@/apis/staff";
+import type {
+  CreateStaffRequest,
+  StaffResponse,
+  UpdateStaffRequest,
+} from "@/schemas/staff";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const PAGE_SIZE = 20;
@@ -37,6 +47,46 @@ export const searchStaffs = createAsyncThunk(
   },
 );
 
+export const addStaff = createAsyncThunk(
+  "staffs/create",
+  async (body: CreateStaffRequest, { rejectWithValue }) => {
+    try {
+      await createRequest(body);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Create failed";
+      return rejectWithValue(message);
+    }
+  },
+);
+
+export const updateStaff = createAsyncThunk(
+  "staffs/update",
+  async (
+    { id, body }: { id: string; body: UpdateStaffRequest },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await updateRequest(id, body);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Update failed";
+      return rejectWithValue(message);
+    }
+  },
+);
+
+export const deleteStaff = createAsyncThunk(
+  "staffs/delete",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await deleteRequest(id);
+      return id;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Delete failed";
+      return rejectWithValue(message);
+    }
+  },
+);
+
 const staffSlice = createSlice({
   name: "staffs",
   initialState,
@@ -65,6 +115,20 @@ const staffSlice = createSlice({
         state.status = "failed";
         state.initialized = true;
         state.error = (action.payload as string) ?? "Retrieving data failed";
+      })
+      .addCase(updateStaff.fulfilled, (state, action) => {
+        const index = state.staffs.findIndex(
+          (staff) => staff.id === action.payload.id,
+        );
+        if (index !== -1) {
+          state.staffs[index] = action.payload;
+        }
+      })
+      .addCase(deleteStaff.fulfilled, (state, action) => {
+        state.staffs = state.staffs.filter(
+          (staff) => staff.id !== action.payload,
+        );
+        state.totalElements = Math.max(0, state.totalElements - 1);
       });
   },
 });
