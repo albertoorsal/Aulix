@@ -1,5 +1,6 @@
-import { GraduationCap, Users } from "lucide-react";
-import { NavLink } from "react-router";
+import { ChevronRight, GraduationCap, Users } from "lucide-react";
+import { Collapsible as CollapsiblePrimitive } from "radix-ui";
+import { NavLink, useLocation } from "react-router";
 
 import {
   Sidebar,
@@ -26,6 +27,8 @@ const userRoles = [
 ];
 
 export function AppSidebar() {
+  const location = useLocation();
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -53,30 +56,36 @@ export function AppSidebar() {
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton isActive tooltip="Users">
-                  <Users />
-                  <span>Users</span>
-                </SidebarMenuButton>
-                <SidebarMenuSub>
-                  {userRoles.map((role) => (
-                    <SidebarMenuSubItem key={role.label}>
-                      <SidebarMenuSubButton asChild>
-                        <NavLink
-                          to={role.href}
-                          className={({ isActive }) =>
-                            isActive
-                              ? "font-medium text-sidebar-foreground"
-                              : undefined
-                          }
-                        >
-                          <span>{role.label}</span>
-                        </NavLink>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </SidebarMenuItem>
+              <CollapsiblePrimitive.Root defaultOpen asChild>
+                <SidebarMenuItem>
+                  <CollapsiblePrimitive.Trigger asChild>
+                    <SidebarMenuButton
+                      tooltip="Users"
+                      className="[&[data-state=open]>svg:last-child]:rotate-90"
+                    >
+                      <Users />
+                      <span>Users</span>
+                      <ChevronRight className="ml-auto transition-transform duration-200" />
+                    </SidebarMenuButton>
+                  </CollapsiblePrimitive.Trigger>
+                  <CollapsiblePrimitive.Content className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                    <SidebarMenuSub>
+                      {userRoles.map((role) => (
+                        <SidebarMenuSubItem key={role.label}>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={location.pathname === role.href}
+                          >
+                            <NavLink to={role.href}>
+                              <span>{role.label}</span>
+                            </NavLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsiblePrimitive.Content>
+                </SidebarMenuItem>
+              </CollapsiblePrimitive.Root>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
