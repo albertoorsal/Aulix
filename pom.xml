@@ -27,6 +27,7 @@
         <module>applications/auth-service</module>
         <module>applications/student-service</module>
         <module>applications/staff-service</module>
+        <module>applications/teacher-service</module>
     </modules>
 
     <properties>
