@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/auth/authSlice";
 import studentReducer from "../features/students/studentSlice";
 import staffReducer from "../features/staffs/staffSlice";
+import teacherReducer from "../features/teachers/teacherSlice";
 
 export const store = configureStore({
   reducer: {
@@ -9,6 +10,7 @@ export const store = configureStore({
     // HERE add more slices
     students: studentReducer,
     staffs: staffReducer,
+    teachers: teacherReducer,
   },
 });
 

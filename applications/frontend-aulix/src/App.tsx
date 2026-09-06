@@ -10,6 +10,7 @@ import Admin from "./pages/Admin";
 import PublicRoute from "./routes/PublicRouter";
 import Student from "./pages/Student";
 import Staff from "./pages/Staff";
+import Teacher from "./pages/Teacher";
 import { Toaster } from "./components/ui/sonner";
 
 function App() {
@@ -46,6 +47,8 @@ function App() {
           <Route path="/students" element={<Student />} />
 
           <Route path="/staff" element={<Staff />} />
+
+          <Route path="/teachers" element={<Teacher />} />
 
           {/* Private AND admin-only: guards nest */}
           <Route element={<RoleRoute allow={["ADMIN"]} />}>

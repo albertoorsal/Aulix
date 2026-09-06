@@ -22,7 +22,7 @@ const userRoles = [
   { label: "Student", href: "/students" },
   { label: "Staff", href: "/staff" },
   { label: "Admin", href: "#" },
-  { label: "Teacher", href: "#" },
+  { label: "Teacher", href: "/teachers" },
   { label: "Parent", href: "#" },
 ];
 
