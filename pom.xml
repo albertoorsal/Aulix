@@ -28,6 +28,7 @@
         <module>applications/student-service</module>
         <module>applications/staff-service</module>
         <module>applications/teacher-service</module>
+        <module>applications/subject-service</module>
     </modules>
 
     <properties>
