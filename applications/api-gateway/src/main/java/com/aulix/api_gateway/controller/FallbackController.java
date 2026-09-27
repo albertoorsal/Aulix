@@ -17,8 +17,38 @@ import java.util.Map;
 @RestController
 public class FallbackController {
 
-    // Here all fallback for each service
+    // @RequestMapping (not @GetMapping): the gateway forwards the original method, so a failed
+    // POST/PUT/DELETE must land here too.
 
+    @RequestMapping("/fallback/student")
+    public Mono<ResponseEntity<Map<String, Object>>> studentFallback() {
+        return fallbackResponse("Student service");
+    }
+
+    @RequestMapping("/fallback/staff")
+    public Mono<ResponseEntity<Map<String, Object>>> staffFallback() {
+        return fallbackResponse("Staff service");
+    }
+
+    @RequestMapping("/fallback/teacher")
+    public Mono<ResponseEntity<Map<String, Object>>> teacherFallback() {
+        return fallbackResponse("Teacher service");
+    }
+
+    @RequestMapping("/fallback/subject")
+    public Mono<ResponseEntity<Map<String, Object>>> subjectFallback() {
+        return fallbackResponse("Subject service");
+    }
+
+    @RequestMapping("/fallback/auth")
+    public Mono<ResponseEntity<Map<String, Object>>> authFallback() {
+        return fallbackResponse("Authentication service");
+    }
+
+    @RequestMapping("/fallback/user")
+    public Mono<ResponseEntity<Map<String, Object>>> userFallback() {
+        return fallbackResponse("User service");
+    }
 
     private Mono<ResponseEntity<Map<String, Object>>> fallbackResponse(String service) {
         return Mono.just(ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of(

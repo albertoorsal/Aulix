@@ -14,26 +14,56 @@ spring:
               uri: lb://student-service
               predicates:
                 - Path=/api/students/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: studentServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/student
             - id: staff-service
               uri: lb://staff-service
               predicates:
                 - Path=/api/staff/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: staffServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/staff
             - id: teacher-service
               uri: lb://teacher-service
               predicates:
                 - Path=/api/teachers/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: teacherServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/teacher
             - id: subject-service
               uri: lb://subject-service
               predicates:
                 - Path=/api/subjects/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: subjectServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/subject
             - id: auth-service
               uri: lb://auth-service
               predicates:
                 - Path=/api/auth/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: authServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/auth
             - id: user-service
               uri: lb://auth-service
               predicates:
                 - Path=/api/users/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: authServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/user
 management:
   endpoints:
     web:
@@ -55,5 +85,20 @@ resilience4j:
         base-config: default
       subjectServiceCircuitBreaker:
         base-config: default
-      notificationServiceCircuitBreaker:
+      authServiceCircuitBreaker:
         base-config: default
+  timelimiter:
+    instances:
+      # Routes now pass through the CircuitBreaker filter, which also enforces a time limit.
+      # Creating a student/staff/teacher synchronously provisions a user in auth-service, and
+      # subject assignment calls teacher/student-service, so the shared 3s default is too tight.
+      studentServiceCircuitBreaker:
+        timeout-duration: 10s
+      staffServiceCircuitBreaker:
+        timeout-duration: 10s
+      teacherServiceCircuitBreaker:
+        timeout-duration: 10s
+      subjectServiceCircuitBreaker:
+        timeout-duration: 10s
+      authServiceCircuitBreaker:
+        timeout-duration: 5s

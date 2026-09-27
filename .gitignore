@@ -1,0 +1,11 @@
+# Build output (covers modules without their own .gitignore, e.g. subject-service, teacher-service)
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+node_modules/
+dist/
+
+# OS / IDE
+.DS_Store
+*.iml
+.vscode/
