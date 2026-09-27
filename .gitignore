@@ -9,3 +9,6 @@ dist/
 .DS_Store
 *.iml
 .vscode/
+
+# Local run logs
+.run/

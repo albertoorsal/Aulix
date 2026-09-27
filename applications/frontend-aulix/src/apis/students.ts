@@ -6,6 +6,7 @@ import type {
   StudentSearchResponse,
   UpdateStudentRequest,
 } from "../schemas/student";
+import { toApiRequestError } from "@/lib/api-error";
 
 const API_BASE = "http://localhost:8080/api/students";
 
@@ -41,6 +42,21 @@ export async function searchRequest({
   }
 
   const body = (await response.json()) as StudentSearchResponse;
+  return body.data;
+}
+
+export async function getByIdRequest(id: string): Promise<StudentResponse> {
+  const response = await fetch(`${API_BASE}/${id}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw await toApiRequestError(response, "Student not found");
+  }
+
+  const body = (await response.json()) as ApiResponse<StudentResponse>;
   return body.data;
 }
 

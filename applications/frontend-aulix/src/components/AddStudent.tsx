@@ -13,14 +13,9 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { format } from "date-fns";
 import { useFormik } from "formik";
+import DatePicker from "@/components/DatePicker";
 import { toast } from "sonner";
 import { useAppDispatch } from "@/store/hooks";
 import { addStudent, searchStudents } from "../features/students/studentSlice";
@@ -141,31 +136,12 @@ export default function AddStudent() {
                 <FieldLabel htmlFor="date-picker-enrollment">
                   Enrollment Date
                 </FieldLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      id="date-picker-enrollment"
-                      className="w-full justify-start font-normal"
-                    >
-                      {formik.values.enrollmentDate ? (
-                        format(formik.values.enrollmentDate, "dd/MM/yyyy")
-                      ) : (
-                        <span>Enrollment Date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={formik.values.enrollmentDate}
-                      onSelect={(date) =>
-                        formik.setFieldValue("enrollmentDate", date)
-                      }
-                      defaultMonth={formik.values.enrollmentDate}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker
+                  id="date-picker-enrollment"
+                  value={formik.values.enrollmentDate}
+                  onChange={(date) => formik.setFieldValue("enrollmentDate", date)}
+                  placeholder="Enrollment Date"
+                />
               </Field>
               <Field>
                 <Label htmlFor="firstName">Names(s)</Label>
@@ -231,31 +207,14 @@ export default function AddStudent() {
                 <FieldLabel htmlFor="date-picker-simple">
                   Date of birth
                 </FieldLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      id="date-picker-simple"
-                      className="w-full justify-start font-normal"
-                    >
-                      {formik.values.dateOfBirth ? (
-                        format(formik.values.dateOfBirth, "dd/MM/yyyy")
-                      ) : (
-                        <span>Date of birth</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={formik.values.dateOfBirth}
-                      onSelect={(date) =>
-                        formik.setFieldValue("dateOfBirth", date)
-                      }
-                      defaultMonth={formik.values.dateOfBirth}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker
+                  id="date-picker-simple"
+                  value={formik.values.dateOfBirth}
+                  onChange={(date) => formik.setFieldValue("dateOfBirth", date)}
+                  placeholder="Date of birth"
+                  kind="birth"
+                  defaultYear={new Date().getFullYear() - 12}
+                />
               </Field>
             </div>
           </FieldGroup>

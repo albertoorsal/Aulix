@@ -11,6 +11,9 @@ import PublicRoute from "./routes/PublicRouter";
 import Student from "./pages/Student";
 import Staff from "./pages/Staff";
 import Teacher from "./pages/Teacher";
+import Subject from "./pages/Subject";
+import SubjectDetail from "./pages/SubjectDetail";
+import { SUBJECT_VIEW_ROLES } from "./schemas/subject";
 import { Toaster } from "./components/ui/sonner";
 
 function App() {
@@ -49,6 +52,12 @@ function App() {
           <Route path="/staff" element={<Staff />} />
 
           <Route path="/teachers" element={<Teacher />} />
+
+          {/* Subjects: ADMIN/STAFF edit, TEACHER is read-only (enforced in the page) */}
+          <Route element={<RoleRoute allow={SUBJECT_VIEW_ROLES} />}>
+            <Route path="/subjects" element={<Subject />} />
+            <Route path="/subjects/:id" element={<SubjectDetail />} />
+          </Route>
 
           {/* Private AND admin-only: guards nest */}
           <Route element={<RoleRoute allow={["ADMIN"]} />}>

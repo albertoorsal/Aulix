@@ -1,4 +1,5 @@
-import type { ReactNode } from "react"
+import { Fragment, type ReactNode } from "react"
+import { Link } from "react-router"
 import { LogOut, Settings, User } from "lucide-react"
 
 import { AppSidebar } from "@/components/layout/AppSidebar"
@@ -26,13 +27,23 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 
+export interface BreadcrumbEntry {
+    label: string
+    href?: string
+}
+
 export function DashboardLayout({
     children,
     breadcrumb = "Users",
+    breadcrumbs,
 }: {
     children: ReactNode
     breadcrumb?: string
+    // Full trail after "Dashboard"; the last entry is the current page. Overrides `breadcrumb`.
+    breadcrumbs?: BreadcrumbEntry[]
 }) {
+    const trail = breadcrumbs ?? [{ label: breadcrumb }]
+
     return (
         <SidebarProvider>
             <AppSidebar />
@@ -44,12 +55,24 @@ export function DashboardLayout({
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem>
-                                    <BreadcrumbLink href="#">Dashboard</BreadcrumbLink>
+                                    <BreadcrumbLink asChild>
+                                        <Link to="/dashboard">Dashboard</Link>
+                                    </BreadcrumbLink>
                                 </BreadcrumbItem>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbItem>
-                                    <BreadcrumbPage>{breadcrumb}</BreadcrumbPage>
-                                </BreadcrumbItem>
+                                {trail.map((entry, i) => (
+                                    <Fragment key={`${entry.label}-${i}`}>
+                                        <BreadcrumbSeparator />
+                                        <BreadcrumbItem>
+                                            {i < trail.length - 1 && entry.href ? (
+                                                <BreadcrumbLink asChild>
+                                                    <Link to={entry.href}>{entry.label}</Link>
+                                                </BreadcrumbLink>
+                                            ) : (
+                                                <BreadcrumbPage>{entry.label}</BreadcrumbPage>
+                                            )}
+                                        </BreadcrumbItem>
+                                    </Fragment>
+                                ))}
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>

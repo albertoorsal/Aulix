@@ -5,6 +5,7 @@ import type {
   UpdateTeacherRequest,
 } from "@/schemas/teacher";
 import type { ApiResponse, PageResponse } from "@/schemas/student";
+import { toApiRequestError } from "@/lib/api-error";
 
 const API_BASE = "http://localhost:8080/api/teachers";
 
@@ -42,6 +43,21 @@ export async function searchRequest({
   }
 
   const body = (await response.json()) as TeacherSearchResponse;
+  return body.data;
+}
+
+export async function getByIdRequest(id: string): Promise<TeacherResponse> {
+  const response = await fetch(`${API_BASE}/${id}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw await toApiRequestError(response, "Teacher not found");
+  }
+
+  const body = (await response.json()) as ApiResponse<TeacherResponse>;
   return body.data;
 }
 

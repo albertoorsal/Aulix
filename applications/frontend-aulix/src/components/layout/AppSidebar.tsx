@@ -1,4 +1,4 @@
-import { ChevronRight, GraduationCap, Users } from "lucide-react";
+import { BookOpen, ChevronRight, GraduationCap, Users } from "lucide-react";
 import { Collapsible as CollapsiblePrimitive } from "radix-ui";
 import { NavLink, useLocation } from "react-router";
 
@@ -17,6 +17,8 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { useHasAnyRole } from "@/hooks/use-has-role";
+import { SUBJECT_VIEW_ROLES } from "@/schemas/subject";
 
 const userRoles = [
   { label: "Student", href: "/students" },
@@ -28,6 +30,7 @@ const userRoles = [
 
 export function AppSidebar() {
   const location = useLocation();
+  const canViewSubjects = useHasAnyRole(SUBJECT_VIEW_ROLES);
 
   return (
     <Sidebar collapsible="icon">
@@ -86,6 +89,22 @@ export function AppSidebar() {
                   </CollapsiblePrimitive.Content>
                 </SidebarMenuItem>
               </CollapsiblePrimitive.Root>
+
+              {canViewSubjects && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip="Subjects"
+                    // Also highlight on /subjects/:id detail pages.
+                    isActive={location.pathname.startsWith("/subjects")}
+                  >
+                    <NavLink to="/subjects">
+                      <BookOpen />
+                      <span>Subjects</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

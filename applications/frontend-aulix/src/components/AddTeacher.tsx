@@ -13,12 +13,6 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -28,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { format } from "date-fns";
 import { useFormik } from "formik";
+import DatePicker from "@/components/DatePicker";
 import { toast } from "sonner";
 import { useAppDispatch } from "@/store/hooks";
 import { addTeacher, searchTeachers } from "../features/teachers/teacherSlice";
@@ -163,29 +158,12 @@ export default function AddTeacher() {
               </Field>
               <Field>
                 <FieldLabel htmlFor="date-picker-hire">Hire Date</FieldLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      id="date-picker-hire"
-                      className="w-full justify-start font-normal"
-                    >
-                      {formik.values.hireDate ? (
-                        format(formik.values.hireDate, "dd/MM/yyyy")
-                      ) : (
-                        <span>Hire Date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={formik.values.hireDate}
-                      onSelect={(date) => formik.setFieldValue("hireDate", date)}
-                      defaultMonth={formik.values.hireDate}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker
+                  id="date-picker-hire"
+                  value={formik.values.hireDate}
+                  onChange={(date) => formik.setFieldValue("hireDate", date)}
+                  placeholder="Hire Date"
+                />
               </Field>
               <Field>
                 <Label htmlFor="firstName">Name(s)</Label>
@@ -226,31 +204,14 @@ export default function AddTeacher() {
               </Field>
               <Field>
                 <FieldLabel htmlFor="date-picker-dob">Date of birth</FieldLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      id="date-picker-dob"
-                      className="w-full justify-start font-normal"
-                    >
-                      {formik.values.dateOfBirth ? (
-                        format(formik.values.dateOfBirth, "dd/MM/yyyy")
-                      ) : (
-                        <span>Date of birth</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={formik.values.dateOfBirth}
-                      onSelect={(date) =>
-                        formik.setFieldValue("dateOfBirth", date)
-                      }
-                      defaultMonth={formik.values.dateOfBirth}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker
+                  id="date-picker-dob"
+                  value={formik.values.dateOfBirth}
+                  onChange={(date) => formik.setFieldValue("dateOfBirth", date)}
+                  placeholder="Date of birth"
+                  kind="birth"
+                  defaultYear={new Date().getFullYear() - 35}
+                />
               </Field>
               <Field>
                 <Label htmlFor="curp">CURP</Label>

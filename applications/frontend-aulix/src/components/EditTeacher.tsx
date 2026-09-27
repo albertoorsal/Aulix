@@ -12,12 +12,6 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect } from "react";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -27,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { format, parseISO } from "date-fns";
 import { useFormik } from "formik";
+import DatePicker from "@/components/DatePicker";
 import { toast } from "sonner";
 import { useAppDispatch } from "@/store/hooks";
 import { updateTeacher } from "../features/teachers/teacherSlice";
@@ -173,31 +168,14 @@ export default function EditTeacher({
               </Field>
               <Field>
                 <FieldLabel htmlFor="edit-date-picker">Date of birth</FieldLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      id="edit-date-picker"
-                      className="w-full justify-start font-normal"
-                    >
-                      {formik.values.dateOfBirth ? (
-                        format(formik.values.dateOfBirth, "dd/MM/yyyy")
-                      ) : (
-                        <span>Date of birth</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={formik.values.dateOfBirth}
-                      onSelect={(date) =>
-                        formik.setFieldValue("dateOfBirth", date)
-                      }
-                      defaultMonth={formik.values.dateOfBirth}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker
+                  id="edit-date-picker"
+                  value={formik.values.dateOfBirth}
+                  onChange={(date) => formik.setFieldValue("dateOfBirth", date)}
+                  placeholder="Date of birth"
+                  kind="birth"
+                  defaultYear={new Date().getFullYear() - 35}
+                />
               </Field>
               <Field>
                 <FieldLabel htmlFor="edit-teacherType">

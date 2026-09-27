@@ -17,7 +17,9 @@ interface AuthState {
 const initialState: AuthState = {
   user: null,
   status: "idle",
-  initialized: true,
+  // false until checkAuth settles, so App shows its loading state instead of letting the
+  // route guards redirect a signed-in user to /login on a hard refresh or deep link.
+  initialized: false,
   error: null,
 };
 

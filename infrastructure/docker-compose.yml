@@ -1,0 +1,28 @@
+# Local development database for all Aulix services (they share one database, each with its
+# own Flyway history table). Start with:
+#   docker compose -f infrastructure/docker-compose.yml up -d
+# Services connect via DB_URL=jdbc:postgresql://localhost:5433/aulatech_db (see config-repo).
+# Host port 5433 avoids clashing with other local Postgres instances on 5432.
+name: aulix
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: aulix-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aulatech_db
+      POSTGRES_USER: ${AULIX_DB_USERNAME:-aulix}
+      POSTGRES_PASSWORD: ${AULIX_DB_PASSWORD:-aulix}
+    ports:
+      - "5433:5432"
+    volumes:
+      - aulix-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d aulatech_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  aulix-pgdata:
