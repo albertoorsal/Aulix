@@ -87,12 +87,14 @@ public class User extends BaseEntity {
         return roles;
     }
 
-    public void assignRole(Role role) {
-        this.roles.add(role);
+    /** @return true if the user did not already have the role */
+    public boolean assignRole(Role role) {
+        return this.roles.add(role);
     }
 
-    public void revokeRole(Role role) {
-        this.roles.remove(role);
+    /** @return true if the user had the role */
+    public boolean revokeRole(Role role) {
+        return this.roles.remove(role);
     }
 
     public Set<String> roleNames() {

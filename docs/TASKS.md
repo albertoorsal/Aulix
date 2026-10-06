@@ -11,7 +11,7 @@ Tasks are grouped into phases with clear deliverables, priorities and status tra
 
 | 📋 Total Tasks | ✅ Completed | 🔄 In Progress | ⬜ Not Started |
 |:---:|:---:|:---:|:---:|
-| **97** | **61** (63%) | **0** (0%) | **36** (37%) |
+| **97** | **69** (71%) | **0** (0%) | **28** (29%) |
 
 **Legend:** Priority 🔴 High · 🟠 Medium · 🟢 Low — Status ✅ Completed · 🔄 In Progress · ⬜ Not Started
 
@@ -126,20 +126,20 @@ Create the React application, state management, routing and the base layout.
 
 ---
 
-## ⬜ Phase 9: Admin Module *(old Phase 2)* — `0/8 completed`
+## ✅ Phase 9: Admin Module *(old Phase 2)* — `8/8 completed`
 
-Mostly frontend work: the `/api/users` endpoints already exist.
+Mostly frontend work on top of the existing `/api/users` endpoints, plus an audit log in auth-service.
 
 | # | Task | Priority | Status | Notes |
 |---|---|---|---|---|
-| 9.1 | Replace the `Admin.tsx` placeholder with an admin layout | 🔴 High | ⬜ Not Started | Currently a 7-line placeholder |
-| 9.2 | Fix sidebar "Admin" link | 🔴 High | ⬜ Not Started | Currently `href: "#"` → `/admin` |
-| 9.3 | Users page: paginated search, enable/disable toggle, delete | 🔴 High | ⬜ Not Started | New `usersApi` + `userSlice` |
-| 9.4 | Role management dialog (assign / revoke) | 🔴 High | ⬜ Not Started | `POST /api/users/{id}/roles/{role}` and `/revoke` |
-| 9.5 | User detail / edit page | 🟠 Medium | ⬜ Not Started | `GET/PUT /api/users/{id}` |
-| 9.6 | Backend audit log | 🟠 Medium | ⬜ Not Started | New Flyway table; log role changes and enable/disable |
-| 9.7 | Audit view in the admin module | 🟠 Medium | ⬜ Not Started | Paginated, filter by user and action |
-| 9.8 | Decide the fate of the `permissions` table | 🟢 Low | ⬜ Not Started | Put permissions in the token, or document as unused (ADR) |
+| 9.1 | Replace the `Admin.tsx` placeholder with an admin layout | 🔴 High | ✅ Completed | `Admin.tsx` is the layout for `/admin/*` (Users / Audit log nav + `Outlet`) |
+| 9.2 | Fix sidebar "Admin" link | 🔴 High | ✅ Completed | `/admin`, shown to ADMIN only, active on nested pages |
+| 9.3 | Users page: paginated search, enable/disable toggle, delete | 🔴 High | ✅ Completed | `AdminUsers.tsx`, `usersApi`, `userSlice`; filters by role and status; search also matches email |
+| 9.4 | Role management dialog (assign / revoke) | 🔴 High | ✅ Completed | `UserRolesDialog`; you can't remove your own ADMIN role |
+| 9.5 | User detail / edit page | 🟠 Medium | ✅ Completed | `/admin/users/:id` + `UserFormDialog`; duplicate email → 409 |
+| 9.6 | Backend audit log | 🟠 Medium | ✅ Completed | V5 `audit_log`; logs role changes, enable/disable, update, delete; no-ops aren't logged |
+| 9.7 | Audit view in the admin module | 🟠 Medium | ✅ Completed | `/admin/audit` (email search + action filter) and an Activity card per user |
+| 9.8 | Decide the fate of the `permissions` table | 🟢 Low | ✅ Completed | Kept as reserved, roles only ([ADR 0002](./adr/0002-permissions-table.md)) |
 
 ## ⬜ Phase 10: Parent Module *(old Phase 3)* — `0/10 completed`
 
@@ -204,8 +204,8 @@ Ongoing; about one week for the base.
 | 6 | Teacher Management | 4 | 4 | ✅ Completed |
 | 7 | Platform Cleanup & Decisions | 7 | 7 | ✅ Completed |
 | 8 | Subject Management | 10 | 10 | ✅ Completed |
-| 9 | Admin Module | 8 | 0 | ⬜ Next up |
-| 10 | Parent Module | 10 | 0 | ⬜ Not Started |
+| 9 | Admin Module | 8 | 8 | ✅ Completed |
+| 10 | Parent Module | 10 | 0 | ⬜ Next up |
 | 11 | Notifications (optional) | 7 | 0 | ⬜ Not Started |
 | 12 | Quality & Hardening | 11 | 0 | ⬜ Not Started |
-| | **Total** | **97** | **61** | **63%** |
+| | **Total** | **97** | **69** | **71%** |

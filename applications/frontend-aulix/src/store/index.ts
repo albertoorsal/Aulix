@@ -4,6 +4,8 @@ import studentReducer from "../features/students/studentSlice";
 import staffReducer from "../features/staffs/staffSlice";
 import teacherReducer from "../features/teachers/teacherSlice";
 import subjectReducer from "../features/subjects/subjectSlice";
+import userReducer from "../features/users/userSlice";
+import auditReducer from "../features/users/auditSlice";
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +15,8 @@ export const store = configureStore({
     staffs: staffReducer,
     teachers: teacherReducer,
     subjects: subjectReducer,
+    users: userReducer,
+    audit: auditReducer,
   },
 });
 

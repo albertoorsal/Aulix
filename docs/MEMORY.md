@@ -8,7 +8,7 @@ This document tracks the current state of the project: important context, ongoin
 
 | 📅 Last Updated | 👤 Current Phase | 📈 Overall Progress | 💓 Project Status |
 |:---:|:---:|:---:|:---:|
-| **Sep 27, 2026** | **Phase 9** — Admin Module | **63%** (61 / 97 tasks) | **In Development** — MVP v1.0 |
+| **Oct 6, 2026** | **Phase 10** — Parent Module | **71%** (69 / 97 tasks) | **In Development** — MVP v1.0 |
 
 ---
 
@@ -20,7 +20,8 @@ This document tracks the current state of the project: important context, ongoin
 - ✅ Student, Staff and Teacher management completed (backend + frontend)
 - ✅ Platform cleanup & decisions completed (circuit breakers, fallbacks, CI, Docker Compose, ADR 0001)
 - ✅ Subject management completed (backend + frontend)
-- ⭕ Next: Admin Module (Phase 9)
+- ✅ Admin module completed (users, roles, enable/disable, audit log, ADR 0002) — on branch `feature/admin-module`
+- ⭕ Next: Parent Module (Phase 10)
 
 ## 2. ✅ Completed Tasks
 
@@ -48,26 +49,24 @@ Dates come from the git history. See [TASKS.md](./TASKS.md) for every task.
 | 7 | Circuit breakers + fallbacks, CI, Docker Compose, ADR 0001 | Sep 26, 2026 | |
 | 8 | Subjects frontend (list, form, detail tabs, picker, guards) | Sep 27, 2026 | |
 | 8 | Backend build fix | Sep 27, 2026 | |
+| 9 | Admin module: users page, role dialog, user detail/edit, audit log (V5) + view, ADR 0002 | Oct 6, 2026 | Branch `feature/admin-module` |
 
 ## 3. 🔄 In Progress
 
 | # | Task | Started On | Expected Completion | Notes |
 |---|---|---|---|---|
-| — | *Nothing in progress* | — | — | Phase 9 starts next |
+| — | *Nothing in progress* | — | — | Phase 10 starts next |
 
 ## 4. 📌 Upcoming Tasks
 
 | # | Task | Priority | Notes |
 |---|---|---|---|
-| 9.1 | Admin layout (replace `Admin.tsx` placeholder) | 🔴 High | |
-| 9.2 | Fix sidebar "Admin" link (`#` → `/admin`) | 🔴 High | |
-| 9.3 | Users page: search, enable/disable, delete | 🔴 High | Endpoints already exist |
-| 9.4 | Role management dialog | 🔴 High | |
-| 9.5 | User detail / edit page | 🟠 Medium | |
-| 9.6–9.7 | Audit log (backend + view) | 🟠 Medium | Needs a new table in auth-service |
-| 9.8 | Decide on `permissions` table | 🟢 Low | |
+| 10.1 | Scaffold `parent-service` | 🔴 High | Copy student/subject-service layout, port 8085 |
+| 10.2 | Gateway route `/api/parents/**` + breaker + fallback | 🔴 High | |
+| 10.3–10.6 | Parent CRUD, links, PARENT scoping, RBAC | 🔴 High | ADR 0001 §3 |
+| 10.7–10.10 | Parent frontend + "My children" portal + sidebar link | 🔴 High | |
 
-After Phase 9: **Phase 10** Parent Module → **Phase 11** Notifications (optional) → **Phase 12** Quality & Hardening.
+After Phase 10: **Phase 11** Notifications (optional) → **Phase 12** Quality & Hardening.
 
 ## 5. 💡 Important Context
 
@@ -77,17 +76,20 @@ After Phase 9: **Phase 10** Parent Module → **Phase 11** Notifications (option
 - **Ports:** registry 8761 · config 8888 · gateway 8080 · admin 9090 · auth 9000 · student 8081 · staff 8082 · teacher 8083 · subject 8084 · frontend 5173. Planned: parent 8085, notification 8086.
 - **Auth:** The access token (30 min) and refresh token (14 days) are HttpOnly cookies. The gateway copies the cookie into the `Authorization` header for downstream services.
 - **Provisioning:** Person services create the login account through `POST /api/auth/register` and enrich lists through `POST /api/users/batch`.
-- **Roles:** ADMIN, STAFF, TEACHER, PARENT, STUDENT (`Roles` in security-starter).
+- **Roles:** ADMIN, STAFF, TEACHER, PARENT, STUDENT (`Roles` in security-starter). Authorization is role-only; the `permissions` table/claim is reserved (ADR 0002).
+- **Audit log:** auth-service `audit_log` (V5). `UserServiceImpl` records role changes, enable/disable, update and delete via `AuditLogService`. Read at `GET /api/users/audit-logs` (ADMIN). An admin can't disable, delete, or revoke ADMIN from their own account.
+- **Admin UI:** `/admin` → `Admin.tsx` layout with nested `/admin/users`, `/admin/users/:id`, `/admin/audit`. State in `features/users/userSlice.ts` + `auditSlice.ts` (separate `log` / `activity` lists).
 - **Phase renumbering:** Old Phase 0 → 7, old 1 → 8, old 2–5 → 9–12. **ADR 0001 still uses the old numbers** ("Phase 4" = Phase 11, "Phase 5" = Phase 12).
 
 ## 6. 🐞 Known Issues
 
 | Issue | Impact | Planned Fix |
 |---|---|---|
-| Sidebar "Admin" and "Parent" links point to `#` | Navigation dead ends | 9.2, 10.10 |
-| `Admin.tsx` is a placeholder | No admin UI | 9.1 |
+| Sidebar "Parent" link points to `#` | Navigation dead end | 10.10 |
+| `POST /api/auth/register` is public and accepts any role, including ADMIN | Anyone who can reach the gateway can create an admin account | Restrict to ADMIN/STAFF (or service calls) — Phase 12 |
+| `PUT`/`DELETE /api/users/{id}` allow STAFF and TEACHER, not only ADMIN | Broader than the admin module needs (person services call them with the caller's token) | Review in Phase 12 |
 | Default DB username/password are committed in `config-repo/*.yml` | Credential leak risk | 12.9 |
-| `http://localhost:8080` is hard-coded in `src/apis/*` (5 places) | Can't deploy to another host | 12.10 |
+| `http://localhost:8080` is hard-coded in `src/apis/*` (6 places) | Can't deploy to another host | 12.10 |
 | `COOKIE_SECURE` defaults to `false` | Insecure outside localhost | 12.5 |
 | CORS allows only `http://localhost:5173` | Must be configured per environment | 12.5 |
 | Kafka dependencies and topics are configured, but no producer/consumer code exists | ADR 0001 says services publish events; they don't yet | 11.4 |
@@ -103,6 +105,8 @@ After Phase 9: **Phase 10** Parent Module → **Phase 11** Notifications (option
 | Sep 26, 2026 | Parent ↔ Student is many-to-many (`parent_student` with `relationship`, `primary_contact`), owned by parent-service | ADR 0001 §3 |
 | Sep 26, 2026 | CI on GitHub Actions: backend build + tests with Postgres/Kafka services; frontend lint + build | ADR 0001 §4 |
 | Sep 27, 2026 | Project documentation set created (PRD, ARCHITECTURE, RULES, DESIGN, TASKS, MEMORY) and phases renumbered 1–12 | This document |
+| Oct 6, 2026 | Keep `permissions` as reserved; authorization stays role-based | ADR 0002 |
+| Oct 6, 2026 | Audit endpoint lives at `/api/users/audit-logs` to reuse the existing gateway route/breaker | ARCHITECTURE §4.4 |
 
 ## 8. 🔗 Useful Links
 
@@ -119,17 +123,16 @@ After Phase 9: **Phase 10** Parent Module → **Phase 11** Notifications (option
 
 ## 9. ➡️ Next Steps
 
-1. Create `usersApi` + `userSlice` in the frontend.
-2. Replace `Admin.tsx` with an admin layout and fix the sidebar link.
-3. Build the Users page (search, enable/disable, delete) and the role dialog.
-4. Add the audit table in auth-service, then the audit view.
-5. Write an ADR on the `permissions` table.
+1. Review and merge `feature/admin-module` once CI is green.
+2. Scaffold `parent-service` (10.1) and its gateway route (10.2).
+3. Consider fixing the public `/api/auth/register` role escalation before Phase 12.
 
 ## 10. 📝 Change Log
 
 | Date | Change |
 |---|---|
 | Sep 27, 2026 | Created MEMORY.md. Phases 1–8 recorded as completed; Phase 9 is next. |
+| Oct 6, 2026 | Phase 9 (Admin Module) completed; Phase 10 is next. |
 
 ---
 

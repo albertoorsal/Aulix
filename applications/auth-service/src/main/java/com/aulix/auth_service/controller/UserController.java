@@ -74,9 +74,11 @@ public class UserController {
     @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "', '" + Roles.TEACHER + "')")
     public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> search(
             @RequestParam(required = false) String search,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) Boolean enabled,
             Pageable pageable
     ) {
-        UserSearchCriteria criteria = new UserSearchCriteria(search);
+        UserSearchCriteria criteria = new UserSearchCriteria(search, role, enabled);
         return ResponseEntity.ok(ApiResponse.ok(PageResponse.from(userService.search(criteria, pageable))));
     }
 

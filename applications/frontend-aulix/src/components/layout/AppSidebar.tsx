@@ -19,11 +19,12 @@ import {
 } from "@/components/ui/sidebar";
 import { useHasAnyRole } from "@/hooks/use-has-role";
 import { SUBJECT_VIEW_ROLES } from "@/schemas/subject";
+import { ADMIN_ROLES } from "@/schemas/user";
 
 const userRoles = [
   { label: "Student", href: "/students" },
   { label: "Staff", href: "/staff" },
-  { label: "Admin", href: "#" },
+  { label: "Admin", href: "/admin", roles: ADMIN_ROLES },
   { label: "Teacher", href: "/teachers" },
   { label: "Parent", href: "#" },
 ];
@@ -31,6 +32,7 @@ const userRoles = [
 export function AppSidebar() {
   const location = useLocation();
   const canViewSubjects = useHasAnyRole(SUBJECT_VIEW_ROLES);
+  const isAdmin = useHasAnyRole(ADMIN_ROLES);
 
   return (
     <Sidebar collapsible="icon">
@@ -73,18 +75,25 @@ export function AppSidebar() {
                   </CollapsiblePrimitive.Trigger>
                   <CollapsiblePrimitive.Content className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
                     <SidebarMenuSub>
-                      {userRoles.map((role) => (
-                        <SidebarMenuSubItem key={role.label}>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={location.pathname === role.href}
-                          >
-                            <NavLink to={role.href}>
-                              <span>{role.label}</span>
-                            </NavLink>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
+                      {userRoles
+                        .filter((role) => !role.roles || isAdmin)
+                        .map((role) => (
+                          <SidebarMenuSubItem key={role.label}>
+                            <SidebarMenuSubButton
+                              asChild
+                              // /admin also covers its nested pages (/admin/users/:id, /admin/audit).
+                              isActive={
+                                role.href === "/admin"
+                                  ? location.pathname.startsWith("/admin")
+                                  : location.pathname === role.href
+                              }
+                            >
+                              <NavLink to={role.href}>
+                                <span>{role.label}</span>
+                              </NavLink>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
                     </SidebarMenuSub>
                   </CollapsiblePrimitive.Content>
                 </SidebarMenuItem>

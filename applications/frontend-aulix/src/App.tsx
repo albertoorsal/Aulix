@@ -7,6 +7,9 @@ import { useEffect } from "react";
 import Login from "./pages/Login";
 import RoleRoute from "./routes/RoleRoute";
 import Admin from "./pages/Admin";
+import AdminUsers from "./pages/AdminUsers";
+import AdminUserDetail from "./pages/AdminUserDetail";
+import AdminAuditLog from "./pages/AdminAuditLog";
 import PublicRoute from "./routes/PublicRouter";
 import Student from "./pages/Student";
 import Staff from "./pages/Staff";
@@ -14,6 +17,7 @@ import Teacher from "./pages/Teacher";
 import Subject from "./pages/Subject";
 import SubjectDetail from "./pages/SubjectDetail";
 import { SUBJECT_VIEW_ROLES } from "./schemas/subject";
+import { ADMIN_ROLES } from "./schemas/user";
 import { Toaster } from "./components/ui/sonner";
 
 function App() {
@@ -60,8 +64,13 @@ function App() {
           </Route>
 
           {/* Private AND admin-only: guards nest */}
-          <Route element={<RoleRoute allow={["ADMIN"]} />}>
-            <Route path="/admin" element={<Admin />} />
+          <Route element={<RoleRoute allow={ADMIN_ROLES} />}>
+            <Route path="/admin" element={<Admin />}>
+              <Route index element={<Navigate to="users" replace />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="users/:id" element={<AdminUserDetail />} />
+              <Route path="audit" element={<AdminAuditLog />} />
+            </Route>
           </Route>
         </Route>
 

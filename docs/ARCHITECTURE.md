@@ -31,7 +31,7 @@ Aulix follows a microservices architecture. A React SPA talks only to a Spring C
 | `config-server` | 8888 | Centralized config (native, `infrastructure/config-repo`) | ✅ |
 | `api-gateway` | 8080 | Routing, JWT validation, CORS, cookie-to-header, circuit breakers | ✅ |
 | `admin-server` | 9090 | Spring Boot Admin monitoring UI | ✅ |
-| `auth-service` | 9000 | Users, roles, login, tokens, JWKS, `/api/users` | ✅ |
+| `auth-service` | 9000 | Users, roles, login, tokens, JWKS, `/api/users`, audit log (`/api/users/audit-logs`) | ✅ |
 | `student-service` | 8081 | Students (`/api/students`) | ✅ |
 | `staff-service` | 8082 | Staff (`/api/staff`) | ✅ |
 | `teacher-service` | 8083 | Teachers (`/api/teachers`) | ✅ |
@@ -115,15 +115,16 @@ src/main/resources/db/migration/   # Flyway V1__..., V2__...
 
 ```text
 frontend-aulix/src/
-├── apis/            # fetch clients per domain (auth, students, staff, teachers, subjects)
+├── apis/            # fetch clients per domain (auth, students, staff, teachers, subjects, users)
 ├── components/
 │   ├── layout/      # DashboardLayout, AppSidebar
 │   ├── ui/          # shadcn/ui generated components (do not edit by hand)
 │   └── *.tsx        # Feature dialogs/forms (AddStudent, SubjectFormDialog, PersonPickerDialog...)
-├── features/        # Redux slices per domain (auth, students, staffs, teachers, subjects)
+├── features/        # Redux slices per domain (auth, students, staffs, teachers, subjects, users + audit)
 ├── hooks/           # use-has-role, use-mobile
 ├── lib/             # utils (cn), api-error helpers
-├── pages/           # Route-level pages (Login, Dashboard, Student, Staff, Teacher, Subject, SubjectDetail, Admin)
+├── pages/           # Route-level pages (Login, Dashboard, Student, Staff, Teacher, Subject, SubjectDetail,
+│                    #   Admin layout + AdminUsers, AdminUserDetail, AdminAuditLog)
 ├── routes/          # ProtectedRoute, PublicRoute, RoleRoute
 ├── schemas/         # TypeScript types, Formik validation, role constants
 └── store/           # configureStore + typed hooks
@@ -151,7 +152,14 @@ frontend-aulix/src/
 1. `POST /api/subjects/{id}/teachers/{teacherId}` or `/students/{studentId}`.
 2. subject-service checks that the person exists through `TeacherClient`/`StudentClient`, rejects duplicates (`DuplicateAssignmentException`), and saves the link row.
 
-### 4.4 Failure Handling
+### 4.4 User Administration & Audit
+
+1. An ADMIN changes a user through `/api/users/{id}` (update, delete, enable/disable, assign/revoke role).
+2. In the same transaction, `UserServiceImpl` writes an `audit_log` row through `AuditLogService`: the action, the actor (token `sub` + email), the target's id and email, and details (role name or changed fields). Calls that change nothing are not logged.
+3. An admin can't disable, delete or remove the ADMIN role from their own account (`BUSINESS_RULE_VIOLATION`), so at least one admin always remains.
+4. `GET /api/users/audit-logs?userId=&search=&action=` (ADMIN only) returns the log, newest first. It sits under `/api/users` so it reuses the existing gateway route and breaker.
+
+### 4.5 Failure Handling
 
 Each gateway route passes through a Resilience4j `CircuitBreaker` filter. On connection errors or timeouts (10 s for domain services, 5 s for auth), the request is forwarded to `/fallback/{service}`, which returns a readable `503` body. 4xx and 5xx business errors pass through unchanged.
 
@@ -161,7 +169,7 @@ All services share one PostgreSQL database (`aulatech_db`). Each service owns it
 
 | Service | Tables |
 |---|---|
-| auth-service | `users`, `roles`, `permissions`, `user_roles`, `role_permissions` |
+| auth-service | `users`, `roles`, `permissions`, `user_roles`, `role_permissions`, `audit_log` |
 | student-service | `student` |
 | staff-service | `staff` |
 | teacher-service | `teacher` |
@@ -170,7 +178,8 @@ All services share one PostgreSQL database (`aulatech_db`). Each service owns it
 | notification-service *(planned)* | `notification` |
 
 ```text
-users 1───* user_roles *───1 roles *───* permissions (unused yet)
+users 1───* user_roles *───1 roles *───* permissions (reserved, ADR 0002)
+audit_log.target_user_id ─► users.id (logical, kept after the user is deleted)
 student.user_id ─────► users.id        (logical, no FK)
 staff.user_id   ─────► users.id
 teacher.user_id ─────► users.id
@@ -192,6 +201,7 @@ Detailed records live in [`docs/adr/`](./adr).
 | 5 | Person services provision their own login account | One form creates both the domain record and the user |
 | 6 | Parent ↔ Student is many-to-many, owned by parent-service | Siblings and multiple guardians; student-service stays unaware of parents (ADR 0001) |
 | 7 | notification-service consumes Kafka events (planned) | An outage never blocks enrollment or provisioning (ADR 0001) |
+| 8 | Authorization is role-based; `permissions` is reserved | Roles cover every rule today; avoids two authorization vocabularies (ADR 0002) |
 
 ## 7. Security Considerations
 
@@ -253,4 +263,4 @@ cd applications/frontend-aulix && npm install && npm run dev
 
 ## 11. Summary
 
-Aulix is a Spring Cloud microservices platform with a React SPA. The gateway secures and routes every request. Each domain service owns its data and enforces RBAC. Shared libraries keep responses, errors and security consistent. The platform foundation, authentication and the student, staff, teacher and subject modules are complete. Admin, Parent, Notifications and Quality & Hardening come next (see [TASKS.md](./TASKS.md)).
+Aulix is a Spring Cloud microservices platform with a React SPA. The gateway secures and routes every request. Each domain service owns its data and enforces RBAC. Shared libraries keep responses, errors and security consistent. The platform foundation, authentication and the student, staff, teacher, subject and admin modules are complete. Parent, Notifications and Quality & Hardening come next (see [TASKS.md](./TASKS.md)).
