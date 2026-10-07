@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -56,6 +57,15 @@ public class SubjectController {
     @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "', '" + Roles.TEACHER + "', '" + Roles.STUDENT + "')")
     public ResponseEntity<ApiResponse<SubjectResponse>> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.ok(subjectService.findById(id)));
+    }
+
+    // A PARENT may read only their own children's subjects; parent-service owns the links (ADR 0001 §3).
+    @GetMapping("/students/{studentId}")
+    @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "', '" + Roles.TEACHER + "')"
+            + " or (hasRole('" + Roles.PARENT + "') and @parentClient.isLinkedToCurrentParent(#studentId))")
+    @Operation(summary = "List the Subjects a Student is enrolled in")
+    public ResponseEntity<ApiResponse<List<SubjectResponse>>> findByStudent(@PathVariable UUID studentId) {
+        return ResponseEntity.ok(ApiResponse.ok(subjectService.findByStudent(studentId)));
     }
 
     @PutMapping("/{id}")

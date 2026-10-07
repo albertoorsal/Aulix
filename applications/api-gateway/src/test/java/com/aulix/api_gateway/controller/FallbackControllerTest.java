@@ -16,6 +16,7 @@ class FallbackControllerTest {
             "POST,   /fallback/staff,   Staff service",
             "PUT,    /fallback/teacher, Teacher service",
             "DELETE, /fallback/subject, Subject service",
+            "PATCH,  /fallback/parent,  Parent service",
             "POST,   /fallback/auth,    Authentication service",
             "GET,    /fallback/user,    User service"
     })

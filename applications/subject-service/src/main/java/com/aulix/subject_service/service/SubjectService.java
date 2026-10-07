@@ -7,6 +7,7 @@ import com.aulix.subject_service.dto.UpdateSubjectRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface SubjectService {
@@ -16,6 +17,8 @@ public interface SubjectService {
     Page<SubjectResponse> search(SubjectSearchCriteria criteria, Pageable pageable);
 
     SubjectResponse findById(UUID id);
+
+    List<SubjectResponse> findByStudent(UUID studentId);
 
     SubjectResponse update(UUID id, UpdateSubjectRequest request);
 

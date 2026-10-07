@@ -35,4 +35,16 @@ public class RestClientConfig {
                 .baseUrl("http://student-service")
                 .build();
     }
+
+    @Bean
+    public RestClient parentServiceRestClient(
+            LoadBalancerInterceptor loadBalancerInterceptor,
+            AuthHeaderForwardingInterceptor authHeaderForwardingInterceptor
+    ) {
+        return RestClient.builder()
+                .requestInterceptor(authHeaderForwardingInterceptor)
+                .requestInterceptor(loadBalancerInterceptor)
+                .baseUrl("http://parent-service")
+                .build();
+    }
 }

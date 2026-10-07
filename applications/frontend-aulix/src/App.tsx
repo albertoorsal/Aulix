@@ -16,7 +16,11 @@ import Staff from "./pages/Staff";
 import Teacher from "./pages/Teacher";
 import Subject from "./pages/Subject";
 import SubjectDetail from "./pages/SubjectDetail";
+import Parent from "./pages/Parent";
+import ParentDetail from "./pages/ParentDetail";
+import MyChildren from "./pages/MyChildren";
 import { SUBJECT_VIEW_ROLES } from "./schemas/subject";
+import { PARENT_MANAGE_ROLES, PARENT_PORTAL_ROLES } from "./schemas/parent";
 import { ADMIN_ROLES } from "./schemas/user";
 import { Toaster } from "./components/ui/sonner";
 
@@ -61,6 +65,17 @@ function App() {
           <Route element={<RoleRoute allow={SUBJECT_VIEW_ROLES} />}>
             <Route path="/subjects" element={<Subject />} />
             <Route path="/subjects/:id" element={<SubjectDetail />} />
+          </Route>
+
+          {/* Parents: ADMIN/STAFF manage parents and their links */}
+          <Route element={<RoleRoute allow={PARENT_MANAGE_ROLES} />}>
+            <Route path="/parents" element={<Parent />} />
+            <Route path="/parents/:id" element={<ParentDetail />} />
+          </Route>
+
+          {/* "My children" portal: PARENT sees only their own children (enforced in the backend) */}
+          <Route element={<RoleRoute allow={PARENT_PORTAL_ROLES} />}>
+            <Route path="/my-children" element={<MyChildren />} />
           </Route>
 
           {/* Private AND admin-only: guards nest */}

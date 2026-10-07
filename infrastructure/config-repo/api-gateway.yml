@@ -46,6 +46,15 @@ spring:
                   args:
                     name: subjectServiceCircuitBreaker
                     fallbackUri: forward:/fallback/subject
+            - id: parent-service
+              uri: lb://parent-service
+              predicates:
+                - Path=/api/parents/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: parentServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/parent
             - id: auth-service
               uri: lb://auth-service
               predicates:
@@ -85,13 +94,17 @@ resilience4j:
         base-config: default
       subjectServiceCircuitBreaker:
         base-config: default
+      parentServiceCircuitBreaker:
+        base-config: default
       authServiceCircuitBreaker:
         base-config: default
   timelimiter:
     instances:
       # Routes now pass through the CircuitBreaker filter, which also enforces a time limit.
       # Creating a student/staff/teacher synchronously provisions a user in auth-service, and
-      # subject assignment calls teacher/student-service, so the shared 3s default is too tight.
+      # subject assignment calls teacher/student-service, and parent-service calls auth- and
+      # student-service (which in turn calls back into parent-service for PARENT reads), so the
+      # shared 3s default is too tight.
       studentServiceCircuitBreaker:
         timeout-duration: 10s
       staffServiceCircuitBreaker:
@@ -99,6 +112,8 @@ resilience4j:
       teacherServiceCircuitBreaker:
         timeout-duration: 10s
       subjectServiceCircuitBreaker:
+        timeout-duration: 10s
+      parentServiceCircuitBreaker:
         timeout-duration: 10s
       authServiceCircuitBreaker:
         timeout-duration: 5s

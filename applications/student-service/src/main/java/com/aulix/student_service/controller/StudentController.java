@@ -56,8 +56,10 @@ public class StudentController {
         return ResponseEntity.ok(ApiResponse.ok(PageResponse.from(studentService.search(criteria, pageable))));
     }
 
+    // A PARENT may read only their own children; parent-service owns the links (ADR 0001 §3).
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "', '" + Roles.TEACHER + "')")
+    @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "', '" + Roles.TEACHER + "')"
+            + " or (hasRole('" + Roles.PARENT + "') and @parentClient.isLinkedToCurrentParent(#id))")
     public ResponseEntity<ApiResponse<StudentResponse>> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.ok(studentService.findById(id)));
     }

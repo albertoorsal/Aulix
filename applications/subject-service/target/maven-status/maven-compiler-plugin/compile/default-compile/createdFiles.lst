@@ -2,6 +2,7 @@ com/aulix/subject_service/config/OpenApiConfig.class
 com/aulix/subject_service/domain/SubjectStudent.class
 com/aulix/subject_service/domain/SubjectStatus.class
 com/aulix/subject_service/service/SubjectService.class
+com/aulix/subject_service/client/ParentClient.class
 com/aulix/subject_service/SubjectServiceApplication.class
 com/aulix/subject_service/domain/Subject.class
 com/aulix/subject_service/exception/RemoteServiceException.class

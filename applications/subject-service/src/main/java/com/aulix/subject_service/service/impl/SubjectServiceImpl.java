@@ -2,6 +2,7 @@ package com.aulix.subject_service.service.impl;
 
 import com.aulix.common_core.exception.ResourceNotFoundException;
 import com.aulix.subject_service.domain.Subject;
+import com.aulix.subject_service.domain.SubjectStudent;
 import com.aulix.subject_service.dto.CreateSubjectRequest;
 import com.aulix.subject_service.dto.SubjectResponse;
 import com.aulix.subject_service.dto.SubjectSearchCriteria;
@@ -10,6 +11,7 @@ import com.aulix.subject_service.exception.DuplicateSubjectException;
 import com.aulix.subject_service.mapper.SubjectMapper;
 import com.aulix.subject_service.repository.SubjectRepository;
 import com.aulix.subject_service.repository.SubjectSpecifications;
+import com.aulix.subject_service.repository.SubjectStudentRepository;
 import com.aulix.subject_service.service.SubjectService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -17,16 +19,24 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class SubjectServiceImpl implements SubjectService {
 
     private final SubjectRepository subjectRepository;
+    private final SubjectStudentRepository subjectStudentRepository;
     private final SubjectMapper subjectMapper;
 
-    public SubjectServiceImpl(SubjectRepository subjectRepository, SubjectMapper subjectMapper) {
+    public SubjectServiceImpl(
+            SubjectRepository subjectRepository,
+            SubjectStudentRepository subjectStudentRepository,
+            SubjectMapper subjectMapper
+    ) {
         this.subjectRepository = subjectRepository;
+        this.subjectStudentRepository = subjectStudentRepository;
         this.subjectMapper = subjectMapper;
     }
 
@@ -57,6 +67,18 @@ public class SubjectServiceImpl implements SubjectService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public SubjectResponse findById(UUID id) {
         return subjectMapper.toResponse(getSubjectOrThrow(id));
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<SubjectResponse> findByStudent(UUID studentId) {
+        List<UUID> subjectIds = subjectStudentRepository.findByStudentId(studentId).stream()
+                .map(SubjectStudent::getSubjectId)
+                .toList();
+        return subjectRepository.findAllById(subjectIds).stream()
+                .sorted(Comparator.comparing(Subject::getName, String.CASE_INSENSITIVE_ORDER))
+                .map(subjectMapper::toResponse)
+                .toList();
     }
 
     @Override

@@ -11,7 +11,7 @@ Tasks are grouped into phases with clear deliverables, priorities and status tra
 
 | 📋 Total Tasks | ✅ Completed | 🔄 In Progress | ⬜ Not Started |
 |:---:|:---:|:---:|:---:|
-| **97** | **69** (71%) | **0** (0%) | **28** (29%) |
+| **97** | **79** (81%) | **0** (0%) | **18** (19%) |
 
 **Legend:** Priority 🔴 High · 🟠 Medium · 🟢 Low — Status ✅ Completed · 🔄 In Progress · ⬜ Not Started
 
@@ -141,22 +141,22 @@ Mostly frontend work on top of the existing `/api/users` endpoints, plus an audi
 | 9.7 | Audit view in the admin module | 🟠 Medium | ✅ Completed | `/admin/audit` (email search + action filter) and an Activity card per user |
 | 9.8 | Decide the fate of the `permissions` table | 🟢 Low | ✅ Completed | Kept as reserved, roles only ([ADR 0002](./adr/0002-permissions-table.md)) |
 
-## ⬜ Phase 10: Parent Module *(old Phase 3)* — `0/10 completed`
+## ✅ Phase 10: Parent Module *(old Phase 3)* — `10/10 completed`
 
-The largest new piece of work. The design is fixed in ADR 0001 (many-to-many).
+The design is fixed in ADR 0001 (many-to-many); PARENT read access is decided in [ADR 0003](./adr/0003-parent-read-access.md).
 
 | # | Task | Priority | Status | Notes |
 |---|---|---|---|---|
-| 10.1 | Scaffold `parent-service` | 🔴 High | ⬜ Not Started | Copy the student/staff structure; Flyway, Swagger, Eureka, config-repo |
-| 10.2 | Gateway route `/api/parents/**` + breaker + fallback | 🔴 High | ⬜ Not Started | Add `/fallback/parent` |
-| 10.3 | Parent CRUD + provision login account (role PARENT) | 🔴 High | ⬜ Not Started | Reuse the `UserClient` pattern |
-| 10.4 | Link / unlink parent ↔ student | 🔴 High | ⬜ Not Started | `parent_student` (relationship, primary_contact); validate via `StudentClient` |
-| 10.5 | Restrict PARENT to their own children | 🔴 High | ⬜ Not Started | Enforced in parent-service |
-| 10.6 | Role rules: ADMIN/STAFF create, edit, delete | 🔴 High | ⬜ Not Started | `@PreAuthorize` |
-| 10.7 | `parentsApi` + `parentSlice` | 🔴 High | ⬜ Not Started | |
-| 10.8 | Parents management page (list, add, edit, delete, link) | 🔴 High | ⬜ Not Started | ADMIN/STAFF |
-| 10.9 | "My children" portal for PARENT | 🔴 High | ⬜ Not Started | Child info + enrolled subjects |
-| 10.10 | Fix sidebar "Parent" link + PARENT route guard | 🟠 Medium | ⬜ Not Started | Currently `href: "#"` |
+| 10.1 | Scaffold `parent-service` | 🔴 High | ✅ Completed | Port 8085, V1 `parent` + `parent_student`, `flyway_schema_history_parent`, Swagger, Eureka, config-repo |
+| 10.2 | Gateway route `/api/parents/**` + breaker + fallback | 🔴 High | ✅ Completed | `parentServiceCircuitBreaker` (10 s), `/fallback/parent` |
+| 10.3 | Parent CRUD + provision login account (role PARENT) | 🔴 High | ✅ Completed | `UserClient` pattern; name/email live on the user account; search by name, email or phone |
+| 10.4 | Link / unlink parent ↔ student | 🔴 High | ✅ Completed | `/api/parents/{id}/students/{studentId}` (POST/PUT/DELETE); validated via `StudentClient`; one primary contact per student |
+| 10.5 | Restrict PARENT to their own children | 🔴 High | ✅ Completed | `/api/parents/me/**` scoped by token `sub`; student/subject-service check links via `ParentClient` (ADR 0003) |
+| 10.6 | Role rules: ADMIN/STAFF create, edit, delete | 🔴 High | ✅ Completed | `@PreAuthorize` on every endpoint; PARENT only on `/me` |
+| 10.7 | `parentsApi` + `parentSlice` | 🔴 High | ✅ Completed | `apis/parents.ts`, `features/parents/*`; `listByStudentRequest` in `apis/subjects.ts` |
+| 10.8 | Parents management page (list, add, edit, delete, link) | 🔴 High | ✅ Completed | `/parents`, `/parents/:id`, `ParentFormDialog`, `LinkStudentDialog`, `ParentLinksPanel` |
+| 10.9 | "My children" portal for PARENT | 🔴 High | ✅ Completed | `/my-children`: child info + enrolled subjects (`GET /api/subjects/students/{id}`) |
+| 10.10 | Fix sidebar "Parent" link + PARENT route guard | 🟠 Medium | ✅ Completed | "Parent" → `/parents` (ADMIN/STAFF); "My children" entry + `RoleRoute` for PARENT |
 
 ## ⬜ Phase 11: Notifications *(old Phase 4, optional)* — `0/7 completed`
 
@@ -205,7 +205,7 @@ Ongoing; about one week for the base.
 | 7 | Platform Cleanup & Decisions | 7 | 7 | ✅ Completed |
 | 8 | Subject Management | 10 | 10 | ✅ Completed |
 | 9 | Admin Module | 8 | 8 | ✅ Completed |
-| 10 | Parent Module | 10 | 0 | ⬜ Next up |
-| 11 | Notifications (optional) | 7 | 0 | ⬜ Not Started |
+| 10 | Parent Module | 10 | 10 | ✅ Completed |
+| 11 | Notifications (optional) | 7 | 0 | ⬜ Next up |
 | 12 | Quality & Hardening | 11 | 0 | ⬜ Not Started |
-| | **Total** | **97** | **69** | **71%** |
+| | **Total** | **97** | **79** | **81%** |

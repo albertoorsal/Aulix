@@ -1,4 +1,5 @@
 /Users/albertoornelas/Projects/Aulix/applications/subject-service/src/main/java/com/aulix/subject_service/SubjectServiceApplication.java
+/Users/albertoornelas/Projects/Aulix/applications/subject-service/src/main/java/com/aulix/subject_service/client/ParentClient.java
 /Users/albertoornelas/Projects/Aulix/applications/subject-service/src/main/java/com/aulix/subject_service/client/StudentClient.java
 /Users/albertoornelas/Projects/Aulix/applications/subject-service/src/main/java/com/aulix/subject_service/client/TeacherClient.java
 /Users/albertoornelas/Projects/Aulix/applications/subject-service/src/main/java/com/aulix/subject_service/config/AuthHeaderForwardingInterceptor.java

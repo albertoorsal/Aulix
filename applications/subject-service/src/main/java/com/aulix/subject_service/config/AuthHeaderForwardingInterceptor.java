@@ -13,8 +13,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.io.IOException;
 
 /**
- * teacher-service's and student-service's /api/** endpoints are authenticated resource-server
- * routes, so server-to-server calls need the caller's own bearer token forwarded through,
+ * teacher-service's, student-service's and parent-service's /api/** endpoints are authenticated
+ * resource-server routes, so server-to-server calls need the caller's own bearer token forwarded through,
  * rather than a separate service credential.
  */
 @Component

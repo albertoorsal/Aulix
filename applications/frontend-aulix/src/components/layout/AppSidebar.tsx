@@ -1,4 +1,4 @@
-import { BookOpen, ChevronRight, GraduationCap, Users } from "lucide-react";
+import { BookOpen, ChevronRight, GraduationCap, HeartHandshake, Users } from "lucide-react";
 import { Collapsible as CollapsiblePrimitive } from "radix-ui";
 import { NavLink, useLocation } from "react-router";
 
@@ -18,21 +18,28 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { useHasAnyRole } from "@/hooks/use-has-role";
+import { selectRoles } from "@/features/auth/authSlice";
+import { useAppSelector } from "@/store/hooks";
 import { SUBJECT_VIEW_ROLES } from "@/schemas/subject";
 import { ADMIN_ROLES } from "@/schemas/user";
+import { PARENT_MANAGE_ROLES, PARENT_PORTAL_ROLES } from "@/schemas/parent";
 
 const userRoles = [
   { label: "Student", href: "/students" },
   { label: "Staff", href: "/staff" },
   { label: "Admin", href: "/admin", roles: ADMIN_ROLES },
   { label: "Teacher", href: "/teachers" },
-  { label: "Parent", href: "#" },
+  { label: "Parent", href: "/parents", roles: PARENT_MANAGE_ROLES },
 ];
+
+// Entries with nested pages (/admin/users/:id, /parents/:id) stay active on those pages too.
+const PREFIX_MATCH = new Set(["/admin", "/parents"]);
 
 export function AppSidebar() {
   const location = useLocation();
+  const roles = useAppSelector(selectRoles);
   const canViewSubjects = useHasAnyRole(SUBJECT_VIEW_ROLES);
-  const isAdmin = useHasAnyRole(ADMIN_ROLES);
+  const isParent = useHasAnyRole(PARENT_PORTAL_ROLES);
 
   return (
     <Sidebar collapsible="icon">
@@ -76,15 +83,14 @@ export function AppSidebar() {
                   <CollapsiblePrimitive.Content className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
                     <SidebarMenuSub>
                       {userRoles
-                        .filter((role) => !role.roles || isAdmin)
+                        .filter((role) => !role.roles || role.roles.some((r) => roles.includes(r)))
                         .map((role) => (
                           <SidebarMenuSubItem key={role.label}>
                             <SidebarMenuSubButton
                               asChild
-                              // /admin also covers its nested pages (/admin/users/:id, /admin/audit).
                               isActive={
-                                role.href === "/admin"
-                                  ? location.pathname.startsWith("/admin")
+                                PREFIX_MATCH.has(role.href)
+                                  ? location.pathname.startsWith(role.href)
                                   : location.pathname === role.href
                               }
                             >
@@ -110,6 +116,21 @@ export function AppSidebar() {
                     <NavLink to="/subjects">
                       <BookOpen />
                       <span>Subjects</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+
+              {isParent && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip="My children"
+                    isActive={location.pathname === "/my-children"}
+                  >
+                    <NavLink to="/my-children">
+                      <HeartHandshake />
+                      <span>My children</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

@@ -36,7 +36,7 @@ Aulix follows a microservices architecture. A React SPA talks only to a Spring C
 | `staff-service` | 8082 | Staff (`/api/staff`) | ✅ |
 | `teacher-service` | 8083 | Teachers (`/api/teachers`) | ✅ |
 | `subject-service` | 8084 | Subjects, teacher assignment, student enrollment (`/api/subjects`) | ✅ |
-| `parent-service` | 8085 *(planned)* | Parents and parent–student links (`/api/parents`) | ⏳ |
+| `parent-service` | 8085 | Parents, parent–student links, PARENT self-service (`/api/parents`) | ✅ |
 | `notification-service` | 8086 *(planned)* | In-app notifications (`/api/notifications`) | ⏳ |
 | `frontend-aulix` | 5173 | React SPA | ✅ |
 
@@ -92,6 +92,7 @@ Aulix/
     ├── staff-service/
     ├── teacher-service/
     ├── subject-service/
+    ├── parent-service/
     └── frontend-aulix/             # React SPA
 ```
 
@@ -140,7 +141,7 @@ frontend-aulix/src/
 4. Downstream services validate the bearer token (security-starter) and map the `roles` claim to authorities for `@PreAuthorize`.
 5. On app start, the frontend calls `GET /api/auth/verify` (`checkAuth`) to restore the session. `POST /api/auth/refresh` renews tokens and `POST /api/auth/logout` clears the cookies.
 
-### 4.2 Creating a Person (Student / Staff / Teacher)
+### 4.2 Creating a Person (Student / Staff / Teacher / Parent)
 
 1. The frontend sends `POST /api/students` (for example).
 2. student-service calls auth-service `POST /api/auth/register` through `UserClient`, forwarding the caller's token (`AuthHeaderForwardingInterceptor`), to create the login account with the right role.
@@ -152,14 +153,24 @@ frontend-aulix/src/
 1. `POST /api/subjects/{id}/teachers/{teacherId}` or `/students/{studentId}`.
 2. subject-service checks that the person exists through `TeacherClient`/`StudentClient`, rejects duplicates (`DuplicateAssignmentException`), and saves the link row.
 
-### 4.4 User Administration & Audit
+### 4.4 Parents and the "My children" portal
+
+1. ADMIN/STAFF create a parent with `POST /api/parents`; parent-service provisions the login account with role PARENT (same flow as 4.2).
+2. `POST /api/parents/{id}/students/{studentId}` links a student (`relationship`, `primaryContact`). parent-service validates the student through `StudentClient` and keeps at most one primary contact per student.
+3. A PARENT reads only their own data. `/api/parents/me` and `/api/parents/me/students` resolve the parent from the token's `sub`, never from a client-sent id.
+4. student-service (`GET /api/students/{id}`) and subject-service (`GET /api/subjects/students/{studentId}`) also accept PARENT, but only after asking parent-service `GET /api/parents/me/students/{studentId}` with the forwarded token (`ParentClient`, used from `@PreAuthorize`). A 4xx answer denies; an error or outage fails closed with a 502.
+5. When student-service enriches the student with the user's name, it calls `POST /api/users/batch` with the parent's token. For a PARENT-only caller, auth-service returns only STUDENT accounts.
+
+See [ADR 0003](./adr/0003-parent-read-access.md).
+
+### 4.5 User Administration & Audit
 
 1. An ADMIN changes a user through `/api/users/{id}` (update, delete, enable/disable, assign/revoke role).
 2. In the same transaction, `UserServiceImpl` writes an `audit_log` row through `AuditLogService`: the action, the actor (token `sub` + email), the target's id and email, and details (role name or changed fields). Calls that change nothing are not logged.
 3. An admin can't disable, delete or remove the ADMIN role from their own account (`BUSINESS_RULE_VIOLATION`), so at least one admin always remains.
 4. `GET /api/users/audit-logs?userId=&search=&action=` (ADMIN only) returns the log, newest first. It sits under `/api/users` so it reuses the existing gateway route and breaker.
 
-### 4.5 Failure Handling
+### 4.6 Failure Handling
 
 Each gateway route passes through a Resilience4j `CircuitBreaker` filter. On connection errors or timeouts (10 s for domain services, 5 s for auth), the request is forwarded to `/fallback/{service}`, which returns a readable `503` body. 4xx and 5xx business errors pass through unchanged.
 
@@ -174,7 +185,7 @@ All services share one PostgreSQL database (`aulatech_db`). Each service owns it
 | staff-service | `staff` |
 | teacher-service | `teacher` |
 | subject-service | `subject`, `subject_teacher`, `subject_student` |
-| parent-service *(planned)* | `parent`, `parent_student` |
+| parent-service | `parent`, `parent_student` |
 | notification-service *(planned)* | `notification` |
 
 ```text
@@ -185,7 +196,8 @@ staff.user_id   ─────► users.id
 teacher.user_id ─────► users.id
 subject 1───* subject_teacher ───► teacher.id (logical)
 subject 1───* subject_student ───► student.id (logical)
-parent  1───* parent_student  ───► student.id (logical, planned — many-to-many)
+parent.user_id  ─────► users.id
+parent  1───* parent_student  ───► student.id (logical, many-to-many)
 ```
 
 ## 6. Key Architectural Decisions
@@ -202,6 +214,7 @@ Detailed records live in [`docs/adr/`](./adr).
 | 6 | Parent ↔ Student is many-to-many, owned by parent-service | Siblings and multiple guardians; student-service stays unaware of parents (ADR 0001) |
 | 7 | notification-service consumes Kafka events (planned) | An outage never blocks enrollment or provisioning (ADR 0001) |
 | 8 | Authorization is role-based; `permissions` is reserved | Roles cover every rule today; avoids two authorization vocabularies (ADR 0002) |
+| 9 | PARENT reads are checked downstream against parent-service | No privileged service credential; each service still authorizes the caller itself (ADR 0003) |
 
 ## 7. Security Considerations
 
@@ -242,7 +255,7 @@ mvn -B install -DskipTests
 # 3. Run each service (from the repo root so config-server finds config-repo)
 java -jar applications/service-registry/target/service-registry.jar
 java -jar applications/config-server/target/config-server.jar
-# ... then auth-service, student/staff/teacher/subject-service, api-gateway
+# ... then auth-service, student/staff/teacher/subject/parent-service, api-gateway
 
 # 4. Frontend
 cd applications/frontend-aulix && npm install && npm run dev
@@ -263,4 +276,4 @@ cd applications/frontend-aulix && npm install && npm run dev
 
 ## 11. Summary
 
-Aulix is a Spring Cloud microservices platform with a React SPA. The gateway secures and routes every request. Each domain service owns its data and enforces RBAC. Shared libraries keep responses, errors and security consistent. The platform foundation, authentication and the student, staff, teacher, subject and admin modules are complete. Parent, Notifications and Quality & Hardening come next (see [TASKS.md](./TASKS.md)).
+Aulix is a Spring Cloud microservices platform with a React SPA. The gateway secures and routes every request. Each domain service owns its data and enforces RBAC. Shared libraries keep responses, errors and security consistent. The platform foundation, authentication and the student, staff, teacher, subject, admin and parent modules are complete. Notifications and Quality & Hardening come next (see [TASKS.md](./TASKS.md)).

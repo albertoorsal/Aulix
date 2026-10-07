@@ -13,7 +13,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.io.IOException;
 
 /**
- * auth-service's /api/users/** endpoints are authenticated resource-server routes, so
+ * auth-service's /api/users/** and parent-service's /api/parents/** endpoints are
+ * authenticated resource-server routes, so
  * server-to-server calls need the caller's own bearer token forwarded through, rather than
  * a separate service credential.
  */

@@ -6,6 +6,7 @@ import teacherReducer from "../features/teachers/teacherSlice";
 import subjectReducer from "../features/subjects/subjectSlice";
 import userReducer from "../features/users/userSlice";
 import auditReducer from "../features/users/auditSlice";
+import parentReducer from "../features/parents/parentSlice";
 
 export const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ export const store = configureStore({
     subjects: subjectReducer,
     users: userReducer,
     audit: auditReducer,
+    parents: parentReducer,
   },
 });
 

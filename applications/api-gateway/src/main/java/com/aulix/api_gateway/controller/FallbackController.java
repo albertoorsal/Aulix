@@ -40,6 +40,11 @@ public class FallbackController {
         return fallbackResponse("Subject service");
     }
 
+    @RequestMapping("/fallback/parent")
+    public Mono<ResponseEntity<Map<String, Object>>> parentFallback() {
+        return fallbackResponse("Parent service");
+    }
+
     @RequestMapping("/fallback/auth")
     public Mono<ResponseEntity<Map<String, Object>>> authFallback() {
         return fallbackResponse("Authentication service");

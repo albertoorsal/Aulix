@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -83,9 +84,28 @@ public class UserController {
     }
 
     @PostMapping("/batch")
-    @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "', '" + Roles.TEACHER + "')")
-    public ResponseEntity<ApiResponse<List<UserResponse>>> findAllByIds(@RequestBody List<UUID> ids) {
-        return ResponseEntity.ok(ApiResponse.ok(userService.findAllByIds(ids)));
+    @PreAuthorize("hasAnyRole('" + Roles.ADMIN + "', '" + Roles.STAFF + "', '" + Roles.TEACHER + "', '" + Roles.PARENT + "')")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> findAllByIds(
+            @RequestBody List<UUID> ids, Authentication authentication
+    ) {
+        List<UserResponse> users = userService.findAllByIds(ids);
+        // student-service enriches a parent's view of their child through this endpoint with the
+        // parent's own token (the parent link itself is checked in student-service). A PARENT-only
+        // caller therefore only ever gets student accounts back, never staff/teacher/admin users.
+        if (isParentOnly(authentication)) {
+            users = users.stream().filter(user -> user.roles().contains(Roles.STUDENT)).toList();
+        }
+        return ResponseEntity.ok(ApiResponse.ok(users));
+    }
+
+    private static boolean isParentOnly(Authentication authentication) {
+        var authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+        return authorities.contains("ROLE_" + Roles.PARENT)
+                && authorities.stream().noneMatch(a -> a.equals("ROLE_" + Roles.ADMIN)
+                        || a.equals("ROLE_" + Roles.STAFF)
+                        || a.equals("ROLE_" + Roles.TEACHER));
     }
 
     @PutMapping("/{id}")

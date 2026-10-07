@@ -61,6 +61,15 @@ export function getByIdRequest(id: string): Promise<SubjectResponse> {
   return request<SubjectResponse>(`/${id}`, { method: "GET" }, "Subject not found");
 }
 
+// Subjects a student is enrolled in. A PARENT may call this for their own children only.
+export function listByStudentRequest(studentId: string): Promise<SubjectResponse[]> {
+  return request<SubjectResponse[]>(
+    `/students/${studentId}`,
+    { method: "GET" },
+    "Could not load enrolled subjects",
+  );
+}
+
 export function createRequest(body: CreateSubjectRequest): Promise<SubjectResponse> {
   return request<SubjectResponse>(
     "",
